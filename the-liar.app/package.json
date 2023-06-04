@@ -1,0 +1,59 @@
+{
+  "name": "the-liar.app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@microsoft/signalr": "^7.0.5",
+    "@testing-library/react": "^14.0.0",
+    "antd": "^5.5.2",
+    "cra-template-typescript": "1.2.0",
+    "css-modules-typescript-loader": "^4.0.1",
+    "mobx": "^6.9.0",
+    "mobx-react-lite": "^3.4.3",
+    "nodemon": "^2.0.22",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.11.2",
+    "react-scripts": "5.0.1",
+    "typescript": "^5.1.3"
+  },
+  "scripts": {
+    "dev": "webpack ",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "sass": "^1.62.1",
+    "sass-loader": "^13.3.1",
+    "webpack": "^5.85.0",
+    "webpack-cli": "^5.1.1"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/test/**",
+      "**/docs/**"
+    ],
+    "delay": 2500,
+    "ext": "js,jsx,ts,tsx,css,scss"
+  }
+}

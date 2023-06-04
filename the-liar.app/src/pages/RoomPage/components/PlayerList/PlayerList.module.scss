@@ -1,0 +1,16 @@
+.playerList {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: 20px;
+  width: 100vw;
+}
+
+.playerCard {
+  position: relative;
+  flex: 0;
+  height: 12rem;
+  width: 10rem;
+}
