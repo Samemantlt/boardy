@@ -1,13 +1,10 @@
-import {Player} from "./room";
+import {Secret, Player, GameStateType} from "./room";
+
+
 
 export type PublicEvent = {
     eventType: string;
     event: any;
-}
-
-export type RoomUpdated = {
-    roomId: string;
-    players: Player[];
 }
 
 export type GameStarted = {
@@ -15,37 +12,54 @@ export type GameStarted = {
     mafiaId: string;
 };
 
-export type RoundStarted = {
-    roomId: string;
-    secret: {
-        text: string;
-    };
-};
-
 export type RoomClosed = {
     roomId: string;
 };
 
-export type SecretShown = {
+export type GameState = NotStarted | NewRound | ShowSecret | Voting | ShowRoundResult | WinMafia | WinPlayers;
+
+export type RoomUpdated = {
     roomId: string;
-    secret: any;
+    players: Player[];
+    state: GameState;
+}
+
+
+
+export type NotStarted = {
+    name: GameStateType.NotStarted;
 };
 
-export type RoundResultShown = {
-    roomId: string;
+export type NewRound = {
+    name: GameStateType.NewRound;
+    secret: Secret;
+};
+
+export type ShowSecret = {
+    name: GameStateType.ShowSecret;
+    secret: Secret;
+};
+
+export type Voting = {
+    name: GameStateType.Voting;
+    votes: {
+        [player: string]: string
+    }
+};
+
+export type ShowRoundResult = {
+    name: GameStateType.ShowRoundResult;
     votes: { [player: string]: string }
     selected?: Player;
     isMafia?: boolean;
 };
 
-export type VotesChanged = {
-    roomId: string;
-    votes: { [player: string]: string }
+export type WinMafia = {
+    name: GameStateType.WinMafia;
 };
 
-export type GameEnd = {
-    roomId: string;
-    isMafiaWin: boolean;
+export type WinPlayers = {
+    name: GameStateType.WinPlayers;
 };
 
 

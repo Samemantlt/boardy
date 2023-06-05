@@ -1,11 +1,15 @@
 import {makeAutoObservable} from "mobx";
 import server from "logic/network/server";
-import {GameEnd, GameStarted, RoomUpdated, RoundResultShown, RoundStarted, SecretShown, VotesChanged} from "./events";
+import {RoomClosed, GameStarted, RoomUpdated, GameState} from "./events";
 
 export type Player = {
     id: string;
     name: string;
     isMafia: boolean;
+}
+
+export type Secret = {
+    text: string;
 }
 
 export class AdminControls {
@@ -40,12 +44,12 @@ export class AdminControls {
     }
 }
 
-export enum GameState {
+export enum GameStateType {
     NotStarted,
-    ShowingSecret,
-    DiscussingSecret,
+    NewRound,
+    ShowSecret,
     Voting,
-    EndVoting,
+    ShowRoundResult,
     WinMafia,
     WinPlayers
 }
@@ -63,15 +67,15 @@ export class TimerInfo {
 export class Room {
     id: string;
     players: Player[] = [];
-    secret?: string;
-    state: GameState = GameState.NotStarted;
+    state?: GameState;
+
     localPlayerName: string;
     timer?: TimerInfo = new TimerInfo(30);
 
     constructor(localPlayerName: string) {
         this.localPlayerName = localPlayerName;
 
-        makeAutoObservable(this, undefined, {autoBind: true});
+        makeAutoObservable(this, undefined, {autoBind: true, deep: true});
     }
 
 
@@ -79,24 +83,33 @@ export class Room {
         return this.players.find(p => p.name === this.localPlayerName);
     }
 
-    getMainText() {
-        if (this.state == GameState.NotStarted)
+    getMainText(): string {
+        if (this.state?.name == GameStateType.NotStarted)
             return "Ожидание начала игры";
 
-        if (this.state == GameState.Voting)
-            return 'Проголосуйте';
-
-        if (this.state == GameState.DiscussingSecret)
-            return `Секрет: ${this.secret}\nОбсудите с другими игроками`
-
-        if (this.state == GameState.ShowingSecret){
+        if (this.state?.name == GameStateType.NewRound) {
             if (!this.getLocal().isMafia)
-                return this.secret;
+                return this.state.secret.text;
             else
                 return 'Вы лжец. Сделайте то же что и окружающие. Не попадитесь'
         }
 
-        return this.secret;
+        if (this.state?.name == GameStateType.ShowSecret)
+            return `Секрет: ${this.state.secret.text}\nОбсудите с другими игроками`
+
+        if (this.state?.name == GameStateType.Voting)
+            return 'Проголосуйте';
+
+        if (this.state?.name == GameStateType.ShowRoundResult)
+            return `${this.state.selected.name} мафия? ${this.state.isMafia ? 'Да' : 'Нет'}`
+
+        if (this.state?.name == GameStateType.WinPlayers)
+            return `Победили игроки`
+
+        if (this.state?.name == GameStateType.WinMafia)
+            return `Победил лжец`
+
+        return 'Ожидание подключения';
     }
 
     async addVote(targetId: string) {
@@ -113,11 +126,7 @@ export class Game {
         makeAutoObservable(this, undefined, {autoBind: true});
         server.on('RoomUpdated', this.onRoomUpdated);
         server.on('GameStarted', this.onGameStarted);
-        server.on('RoundStarted', this.onRoundStarted);
-        server.on('SecretShown', this.onSecretShown);
-        server.on('RoundResultShown', this.onRoundResultShown);
-        server.on('VotesChanged', this.onVotesChanged);
-        server.on('GameEnd', this.onGameEnd);
+        server.on('RoomClosed', this.onRoomClosed);
     }
 
 
@@ -133,67 +142,44 @@ export class Game {
         this.admin = false;
     }
 
-    async startGame(){
+    async startGame() {
         await server.startGame(this.room.id, this.room.getLocal().id);
     }
 
-    async newRound(){
+    async newRound() {
         await server.newRound(this.room.id, this.room.getLocal().id);
     }
 
-    async endVoting(){
+    async endVoting() {
         await server.endVoting(this.room.id, this.room.getLocal().id);
     }
 
-    async startVoting(){
+    async startVoting() {
         await server.startVoting(this.room.id, this.room.getLocal().id);
     }
 
-    async showSecret(){
+    async showSecret() {
         await server.showSecret(this.room.id, this.room.getLocal().id);
     }
 
     private onRoomUpdated(event: RoomUpdated) {
         if (this.room == null) {
             this.room = new Room(this.localPlayerName);
-            this.room.state = GameState.NotStarted;
         }
 
         this.room.id = event.roomId;
         this.room.players = event.players;
+        this.room.state = event.state;
     }
 
     private onGameStarted(event: GameStarted) {
-        this.room.state = GameState.ShowingSecret;
         this.room.players.find(p => p.id == event.mafiaId).isMafia = true;
     }
 
-    private onRoundStarted(event: RoundStarted) {
-        this.room.state = GameState.ShowingSecret;
-        this.room.secret = event.secret.text;
-    }
-
-    private onSecretShown(event: SecretShown) {
-        this.room.state = GameState.DiscussingSecret;
-        this.room.secret = event.secret.text;
-    }
-
-    private onRoundResultShown(event: RoundResultShown) {
-        this.room.state = GameState.EndVoting;
-        this.room.secret = `${event.selected?.name ?? 'none'} мафия? ${event.isMafia ? 'Да' : 'Нет'}`;
-    }
-
-    private onVotesChanged(event: VotesChanged) {
-        this.room.state = GameState.Voting;
-    }
-
-    private onGameEnd(event: GameEnd) {
-        this.room.state = event.isMafiaWin ? GameState.WinMafia : GameState.WinPlayers;
-
-        if (event.isMafiaWin)
-            alert('Победа лжеца');
-        else
-            alert('Победа игроков');
+    private onRoomClosed(event: GameStarted) {
+        this.admin = false;
+        this.room = null;
+        this.localPlayerName = null;
     }
 }
 

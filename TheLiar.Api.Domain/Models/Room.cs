@@ -44,13 +44,18 @@ public class Room : EntityBase
 
     public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
-    public GameStateMachine? GameStateMachine { get; private set; }
+    public GameStateMachine GameStateMachine { get; private set; }
+
+    public GameStateGlobals Globals { get; set; }
     
 
     public Room(Guid id, Player admin)
     {
         Id = id;
         Admin = admin;
+        Globals = CreateGlobals();
+        GameStateMachine = new NotStartedGameState(Globals);
+        
         AddPlayer(admin);
     }
 
@@ -61,7 +66,7 @@ public class Room : EntityBase
         _players.Add(player);
         _players.Sort((p1, p2) => string.Compare(p1.Name, p2.Name, StringComparison.Ordinal));
 
-        RaiseEvent(new RoomUpdated(Id, _players));
+        RaiseRoomUpdated();
     }
 
     public void RemovePlayer(Player player)
@@ -72,12 +77,12 @@ public class Room : EntityBase
             RaiseEvent(new RoomClosed(Id));
         
         if (player.IsMafia)
-            RaiseEvent(new GameEnd(Id, true));
+            Invoke(() => new WinPlayersGameState(Globals));
         
-        if (_players.Count == 1)
-            RaiseEvent(new GameEnd(Id, false));
+        if (_players.Count <= 2)
+            Invoke(() => new WinMafiaGameState(Globals));
 
-        RaiseEvent(new RoomUpdated(Id, _players));
+        RaiseRoomUpdated();
     }
 
     public void StartGame()
@@ -86,7 +91,9 @@ public class Room : EntityBase
 
         RaiseEvent(new GameStarted(Id, Mafia.Id));
         
-        GameStateMachine = new NewRoundGameState(CreateGlobals());
+        Invoke(GameStateMachine.NewRound);
+        
+        RaiseRoomUpdated();
     }
 
     private void InvokeInStateMachine(GameStateMachine sender, Func<GameStateMachine> func)
@@ -95,6 +102,7 @@ public class Room : EntityBase
             return;
 
         GameStateMachine = func();
+        RaiseRoomUpdated();
     }
     
     public void Invoke(Func<GameStateMachine> func)
@@ -105,6 +113,11 @@ public class Room : EntityBase
     private GameStateGlobals CreateGlobals()
     {
         return new GameStateGlobalsSource(this).Build();
+    }
+
+    private void RaiseRoomUpdated()
+    {
+        RaiseEvent(new RoomUpdated(Id, Players, GameStateMachine));
     }
 
 

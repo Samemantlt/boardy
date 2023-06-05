@@ -1,7 +1,7 @@
 import {observer} from "mobx-react-lite";
 import {Card, Space} from "antd";
 import styles from "./PlayerList.module.scss";
-import game, {GameState, Player} from "logic/models/room";
+import game, {GameStateType, Player} from "logic/models/room";
 import React from "react";
 
 
@@ -9,7 +9,7 @@ import React from "react";
 const PlayerCard = observer(({player}:{
     player: Player
 }) => {
-    let isVoting = game.room.state === GameState.Voting;
+    let isVoting = game.room.state?.name === GameStateType.Voting;
 
     async function onCardClick(){
         await game.room.addVote(player.id);
