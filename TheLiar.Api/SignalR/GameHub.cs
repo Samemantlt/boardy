@@ -64,6 +64,11 @@ public class GameHub : Hub<IHubUser>, IHubServer
         return result.RoomId;
     }
 
+    public async Task NextState(Guid roomId, Guid playerId)
+    {
+        await _mediator.Send(new NextState.Request(roomId, playerId));
+    }
+
     public async Task StartGame(Guid roomId, Guid playerId)
     {
         await _mediator.Send(new StartGame.Request(roomId, playerId));

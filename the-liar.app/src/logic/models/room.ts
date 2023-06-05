@@ -208,6 +208,10 @@ export class Game {
         await server.endVoting(this.room.id, this.room.getLocal().id);
     }
 
+    async nextState() {
+        await server.nextState(this.room.id, this.room.getLocal().id);
+    }
+
     async startVoting() {
         await server.startVoting(this.room.id, this.room.getLocal().id);
     }
@@ -231,7 +235,7 @@ export class Game {
         this.room.players.find(p => p.id == event.mafiaId).isMafia = true;
     }
 
-    private onRoomClosed(event: GameStarted) {
+    private onRoomClosed(event: RoomClosed) {
         this.admin = false;
         this.room = null;
         this.localPlayerName = null;

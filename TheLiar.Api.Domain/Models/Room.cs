@@ -59,8 +59,7 @@ public class Room : EntityBase
         AddPlayer(admin);
     }
 
-
-    public void GetPlayer(Guid playerId) => Players.First(p => p.Id == playerId);
+    
     public void AddPlayer(Player player)
     {
         _players.Add(player);
@@ -84,18 +83,7 @@ public class Room : EntityBase
 
         RaiseRoomUpdated();
     }
-
-    public void StartGame()
-    {
-        _players[Random.Shared.Next(_players.Count)].SetMafia();
-
-        RaiseEvent(new GameStarted(Id, Mafia.Id));
-        
-        Invoke(GameStateMachine.NewRound);
-        
-        RaiseRoomUpdated();
-    }
-
+    
     private void InvokeInStateMachine(GameStateMachine sender, Func<GameStateMachine> func)
     {
         if (GameStateMachine != sender)

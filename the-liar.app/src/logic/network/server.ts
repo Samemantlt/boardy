@@ -19,6 +19,8 @@ export interface IEventsServer {
 }
 
 export interface IAdminServer {
+    nextState(room: string, currentPlayer: string): Promise<void>;
+
     startGame(room: string, currentPlayer: string): Promise<void>;
 
     newRound(room: string, currentPlayer: string): Promise<void>;
@@ -81,6 +83,11 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
     async newRound(room: string, currentPlayer: string): Promise<void> {
         console.log(`newRound: ${room} ${currentPlayer}`);
         await this.connection.invoke('NewRound', room, currentPlayer);
+    }
+
+    async nextState(room: string, currentPlayer: string): Promise<void> {
+        console.log(`nextState: ${room} ${currentPlayer}`);
+        await this.connection.invoke('NextState', room, currentPlayer);
     }
 
     on(eventType: string, handler: PublicEventHandler): () => void {
@@ -153,6 +160,10 @@ const fakseServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer = 
     },
     async endVoting(room: string, currentPlayer: string): Promise<void> {
         console.log(`endVoting: ${room} ${currentPlayer}`);
+    },
+
+    async nextState(room: string, currentPlayer: string): Promise<void> {
+        console.log(`nextState: ${room} ${currentPlayer}`);
     },
 
     on(eventType: string, handler: (PublicEvent) => void): () => void {

@@ -47,6 +47,7 @@ const AdminPanel = observer(() => {
             <Button className={styles.adminButton} onClick={game.showSecret}>Показать секрет</Button>
             <Button className={styles.adminButton} onClick={game.startVoting}>Начать голосование</Button>
             <Button className={styles.adminButton} onClick={game.endVoting}>Закончить голосование</Button>
+            <Button className={styles.adminButton} onClick={game.nextState}>Next</Button>
         </Space>
     </Card>
 });

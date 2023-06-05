@@ -2,6 +2,7 @@
 using MediatR;
 using TheLiar.Api.Domain.Extensions;
 using TheLiar.Api.Domain.Models;
+using TheLiar.Api.Domain.Models.StateMachine;
 using TheLiar.Api.Domain.Repositories;
 
 namespace TheLiar.Api.UseCases.Commands;
@@ -110,8 +111,11 @@ public static partial class StartGame
         public async Task Handle(Request request, CancellationToken cancellationToken)
         {
             var room = await _roomRepository.Get(request.RoomId);
+            
+            if (room.GameStateMachine is not NotStartedGameState)
+                throw new Exception("Game already started");
 
-            room.StartGame();
+            room.Invoke(room.GameStateMachine.NewRound);
 
             _roomRepository.Save(room);
         }
@@ -292,6 +296,36 @@ public static partial class EndGame
                 throw new Exception("Game not started");
 
             room.Invoke(room.GameStateMachine.EndGame);
+
+            _roomRepository.Save(room);
+        }
+    }
+}
+
+public static partial class NextState
+{
+    public record Request(Guid RoomId, Guid PlayerId) : IRequest, IAdminRequest;
+
+
+    public class Handler : IRequestHandler<Request>
+    {
+        private readonly IRoomRepository _roomRepository;
+
+
+        public Handler(IRoomRepository roomRepository)
+        {
+            _roomRepository = roomRepository;
+        }
+
+
+        public async Task Handle(Request request, CancellationToken cancellationToken)
+        {
+            var room = await _roomRepository.Get(request.RoomId);
+
+            if (room.GameStateMachine == null)
+                throw new Exception("Game not started");
+
+            room.Invoke(room.GameStateMachine.Next);
 
             _roomRepository.Save(room);
         }

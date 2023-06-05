@@ -85,7 +85,7 @@ public abstract record GameStateMachine
     public virtual GameStateMachine AddVote(Guid sender, Guid other) => GameException.ThrowWrongAction(GetType());
     public virtual GameStateMachine EndVoting() => GameException.ThrowWrongAction(GetType());
     public virtual GameStateMachine EndGame() => GameException.ThrowWrongAction(GetType());
-
+    public abstract GameStateMachine Next();
 
     protected void RaiseEvent(IEvent @event)
     {
@@ -110,8 +110,14 @@ public record NotStartedGameState(GameStateGlobals Globals) : GameStateMachine(G
 
     public override GameStateMachine NewRound()
     {
+        Globals.Room.Players.ElementAt(Random.Shared.Next(Globals.Room.Players.Count)).SetMafia();
+
+        RaiseEvent(new GameStarted(Globals.Room.Id, Globals.Room.Mafia.Id));
+        
         return new NewRoundGameState(Globals);
     }
+
+    public override GameStateMachine Next() => NewRound();
 }
 
 public record NewRoundGameState(GameStateGlobals Globals) : GameStateMachine(Globals)
@@ -133,6 +139,8 @@ public record NewRoundGameState(GameStateGlobals Globals) : GameStateMachine(Glo
     {
         return new ShowSecretGameState(Globals, Secret);
     }
+
+    public override GameStateMachine Next() => ShowSecret();
 }
 
 public record ShowSecretGameState(GameStateGlobals Globals, ISecret Secret) : GameStateMachine(Globals)
@@ -150,6 +158,8 @@ public record ShowSecretGameState(GameStateGlobals Globals, ISecret Secret) : Ga
     {
         return new VotingGameState(Globals);
     }
+    
+    public override GameStateMachine Next() => StartVoting();
 }
 
 public record VotingGameState(
@@ -192,6 +202,8 @@ public record VotingGameState(
     {
         return new ShowRoundResultGameState(Globals, Votes);
     }
+    
+    public override GameStateMachine Next() => EndVoting();
 }
 
 public record ShowRoundResultGameState(
@@ -253,6 +265,8 @@ public record ShowRoundResultGameState(
         
         return new NewRoundGameState(Globals);
     }
+    
+    public override GameStateMachine Next() => NewRound();
 }
 
 public record WinPlayersGameState(GameStateGlobals Globals) : GameStateMachine(Globals)
@@ -261,6 +275,8 @@ public record WinPlayersGameState(GameStateGlobals Globals) : GameStateMachine(G
 
 
     public override void OnConstructed() { }
+    
+    public override GameStateMachine Next() => this;
 }
 
 public record WinMafiaGameState(GameStateGlobals Globals) : GameStateMachine(Globals)
@@ -269,4 +285,6 @@ public record WinMafiaGameState(GameStateGlobals Globals) : GameStateMachine(Glo
 
 
     public override void OnConstructed() { }
+    
+    public override GameStateMachine Next() => this;
 }
