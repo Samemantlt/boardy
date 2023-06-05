@@ -15,7 +15,7 @@ const RoomPage = observer(() => {
     return <div className={styles.roomPage}>
         <SecretView/>
         {game.admin ? <AdminPanel/> : null}
-        <Timer/>
+        <Timer timerInfo={game.room.timer.current}/>
         <PlayerList/>
     </div>
 });

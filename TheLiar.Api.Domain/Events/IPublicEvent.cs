@@ -7,7 +7,8 @@ namespace TheLiar.Api.Domain.Events;
 public record RoomUpdated(
     Guid RoomId,
     IEnumerable<Player> Players,
-    GameStateMachine State
+    GameStateMachine State,
+    GameStateTimeoutOptions TimeoutOptions
 ) : IPublicEvent;
 
 public record GameStarted(

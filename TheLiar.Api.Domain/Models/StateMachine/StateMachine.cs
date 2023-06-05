@@ -9,15 +9,15 @@ namespace TheLiar.Api.Domain.Models.StateMachine;
 
 public record GameStateGlobals(
     Room Room,
-    GameStateOptions Options,
+    GameStateTimeoutOptions TimeoutOptions,
     Action<IEvent> RaiseEvent,
     Func<ISecret> CreateSecret);
 
-public record GameStateOptions(
-    TimeSpan SecretDiscussTimeout,
-    TimeSpan MafiaDiscussTimeout,
-    TimeSpan AfterLastVoteTimeout,
-    TimeSpan AfterRoundTimeout
+public record GameStateTimeoutOptions(
+    TimeSpan NewRoundTimeout,
+    TimeSpan ShowSecretTimeout,
+    TimeSpan VotingTimeout,
+    TimeSpan ShowRoundResultTimeout
 );
 
 public record BoolQuestionSecret(string Text) : ISecret;
@@ -125,7 +125,7 @@ public record NewRoundGameState(GameStateGlobals Globals) : GameStateMachine(Glo
     public override void OnConstructed()
     {
         Secret = Globals.CreateSecret();
-        Invoke(ShowSecret, Globals.Options.SecretDiscussTimeout);
+        Invoke(ShowSecret, Globals.TimeoutOptions.NewRoundTimeout);
     }
 
 
@@ -142,7 +142,7 @@ public record ShowSecretGameState(GameStateGlobals Globals, ISecret Secret) : Ga
 
     public override void OnConstructed()
     {
-        Invoke(StartVoting, Globals.Options.MafiaDiscussTimeout);
+        Invoke(StartVoting, Globals.TimeoutOptions.ShowSecretTimeout);
     }
 
 
@@ -169,7 +169,7 @@ public record VotingGameState(
         if (Votes.Count == Globals.Room.Players.Count)
             Invoke(EndVoting);
 
-        Invoke(EndVoting, Globals.Options.AfterLastVoteTimeout);
+        Invoke(EndVoting, Globals.TimeoutOptions.VotingTimeout);
     }
 
 
@@ -211,9 +211,9 @@ public record ShowRoundResultGameState(
         UpdateSelected();
 
         if (IsMafia ?? false)
-            Invoke(EndGame, Globals.Options.AfterRoundTimeout);
+            Invoke(EndGame, Globals.TimeoutOptions.ShowRoundResultTimeout);
         else
-            Invoke(NewRound, Globals.Options.AfterRoundTimeout);
+            Invoke(NewRound, Globals.TimeoutOptions.ShowRoundResultTimeout);
     }
 
     private void UpdateSelected()

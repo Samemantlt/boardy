@@ -1,7 +1,6 @@
 import {Secret, Player, GameStateType} from "./room";
 
 
-
 export type PublicEvent = {
     eventType: string;
     event: any;
@@ -18,12 +17,19 @@ export type RoomClosed = {
 
 export type GameState = NotStarted | NewRound | ShowSecret | Voting | ShowRoundResult | WinMafia | WinPlayers;
 
+export type TimeoutOptions = {
+    newRoundTimeout: string,
+    showSecretTimeout: string,
+    votingTimeout: string,
+    showRoundResultTimeout: string
+};
+
 export type RoomUpdated = {
     roomId: string;
     players: Player[];
     state: GameState;
+    timeoutOptions: TimeoutOptions
 }
-
 
 
 export type NotStarted = {

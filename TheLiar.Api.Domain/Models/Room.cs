@@ -117,7 +117,7 @@ public class Room : EntityBase
 
     private void RaiseRoomUpdated()
     {
-        RaiseEvent(new RoomUpdated(Id, Players, GameStateMachine));
+        RaiseEvent(new RoomUpdated(Id, Players, GameStateMachine, Globals.TimeoutOptions));
     }
 
 
@@ -139,7 +139,7 @@ public class GameStateGlobalsSource
     {
         return new GameStateGlobals(
             Room,
-            new GameStateOptions(
+            new GameStateTimeoutOptions(
                 TimeSpan.FromSeconds(45),
                 TimeSpan.FromSeconds(90),
                 TimeSpan.FromSeconds(15),

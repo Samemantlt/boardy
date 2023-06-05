@@ -1,6 +1,7 @@
 import {makeAutoObservable} from "mobx";
 import server from "logic/network/server";
-import {RoomClosed, GameStarted, RoomUpdated, GameState} from "./events";
+import {RoomClosed, GameStarted, RoomUpdated, GameState, TimeoutOptions} from "./events";
+import * as moment from "moment";
 
 export type Player = {
     id: string;
@@ -58,9 +59,62 @@ export class TimerInfo {
     durationSec: number;
     started: number;
 
+
     constructor(durationSec: number) {
+        makeAutoObservable(this, undefined, {deep: true, autoBind: true})
+
         this.durationSec = durationSec;
         this.started = Date.now();
+    }
+}
+
+export class GameTimer {
+    options?: {
+        newRoundTimeout: Date,
+        showSecretTimeout: Date,
+        votingTimeout: Date,
+        showRoundResultTimeout: Date,
+    };
+    current?: TimerInfo;
+
+
+    constructor() {
+        makeAutoObservable(this, undefined, {deep: true, autoBind: true})
+    }
+
+
+    updateTimeouts(options: TimeoutOptions, stateType: GameStateType) {
+        this.options = {
+            newRoundTimeout: moment(options.newRoundTimeout, "hh:mm:ss").toDate(),
+            showSecretTimeout: moment(options.showSecretTimeout, "hh:mm:ss").toDate(),
+            votingTimeout: moment(options.votingTimeout, "hh:mm:ss").toDate(),
+            showRoundResultTimeout: moment(options.showRoundResultTimeout, "hh:mm:ss").toDate(),
+        };
+
+        this.refreshTimer(stateType);
+    }
+
+    private refreshTimer(stateType: GameStateType){
+        let duration = this.calcDuration(stateType);
+
+        this.current = duration == undefined ? undefined : new TimerInfo(duration);
+    }
+
+    private calcDuration(stateType: GameStateType): number | undefined {
+        if (stateType == GameStateType.NewRound)
+            return this.options.newRoundTimeout.getSeconds();
+
+        if (stateType == GameStateType.ShowSecret)
+            return this.options.showSecretTimeout.getSeconds();
+
+        if (stateType == GameStateType.Voting)
+            return this.options.votingTimeout.getSeconds();
+
+        if (stateType == GameStateType.ShowRoundResult)
+            return this.options.showRoundResultTimeout.getSeconds();
+
+
+        return undefined;
     }
 }
 
@@ -70,7 +124,7 @@ export class Room {
     state?: GameState;
 
     localPlayerName: string;
-    timer?: TimerInfo = new TimerInfo(30);
+    timer: GameTimer = new GameTimer();
 
     constructor(localPlayerName: string) {
         this.localPlayerName = localPlayerName;
@@ -170,6 +224,7 @@ export class Game {
         this.room.id = event.roomId;
         this.room.players = event.players;
         this.room.state = event.state;
+        this.room.timer.updateTimeouts(event.timeoutOptions, event.state.name);
     }
 
     private onGameStarted(event: GameStarted) {
