@@ -79,12 +79,7 @@ public abstract record GameStateMachine
 
 
     public abstract void OnConstructed();
-    public virtual GameStateMachine NewRound() => GameException.ThrowWrongAction(GetType());
-    public virtual GameStateMachine ShowSecret() => GameException.ThrowWrongAction(GetType());
-    public virtual GameStateMachine StartVoting() => GameException.ThrowWrongAction(GetType());
     public virtual GameStateMachine AddVote(Guid sender, Guid other) => GameException.ThrowWrongAction(GetType());
-    public virtual GameStateMachine EndVoting() => GameException.ThrowWrongAction(GetType());
-    public virtual GameStateMachine EndGame() => GameException.ThrowWrongAction(GetType());
     public abstract GameStateMachine Next();
 
     protected void RaiseEvent(IEvent @event)
@@ -108,7 +103,7 @@ public record NotStartedGameState(GameStateGlobals Globals) : GameStateMachine(G
 
     public override void OnConstructed() { }
 
-    public override GameStateMachine NewRound()
+    public override GameStateMachine Next()
     {
         Globals.Room.Players.ElementAt(Random.Shared.Next(Globals.Room.Players.Count)).SetMafia();
 
@@ -116,8 +111,6 @@ public record NotStartedGameState(GameStateGlobals Globals) : GameStateMachine(G
         
         return new NewRoundGameState(Globals);
     }
-
-    public override GameStateMachine Next() => NewRound();
 }
 
 public record NewRoundGameState(GameStateGlobals Globals) : GameStateMachine(Globals)
@@ -131,16 +124,14 @@ public record NewRoundGameState(GameStateGlobals Globals) : GameStateMachine(Glo
     public override void OnConstructed()
     {
         Secret = Globals.CreateSecret();
-        Invoke(ShowSecret, Globals.TimeoutOptions.NewRoundTimeout);
+        Invoke(Next, Globals.TimeoutOptions.NewRoundTimeout);
     }
 
 
-    public override GameStateMachine ShowSecret()
+    public override GameStateMachine Next()
     {
         return new ShowSecretGameState(Globals, Secret);
     }
-
-    public override GameStateMachine Next() => ShowSecret();
 }
 
 public record ShowSecretGameState(GameStateGlobals Globals, ISecret Secret) : GameStateMachine(Globals)
@@ -150,16 +141,14 @@ public record ShowSecretGameState(GameStateGlobals Globals, ISecret Secret) : Ga
 
     public override void OnConstructed()
     {
-        Invoke(StartVoting, Globals.TimeoutOptions.ShowSecretTimeout);
+        Invoke(Next, Globals.TimeoutOptions.ShowSecretTimeout);
     }
 
 
-    public override GameStateMachine StartVoting()
+    public override GameStateMachine Next()
     {
         return new VotingGameState(Globals);
     }
-    
-    public override GameStateMachine Next() => StartVoting();
 }
 
 public record VotingGameState(
@@ -177,9 +166,9 @@ public record VotingGameState(
     public override void OnConstructed()
     {
         if (Votes.Count == Globals.Room.Players.Count)
-            Invoke(EndVoting);
+            Invoke(Next);
 
-        Invoke(EndVoting, Globals.TimeoutOptions.VotingTimeout);
+        Invoke(Next, Globals.TimeoutOptions.VotingTimeout);
     }
 
 
@@ -198,12 +187,10 @@ public record VotingGameState(
         };
     }
 
-    public override GameStateMachine EndVoting()
+    public override GameStateMachine Next()
     {
         return new ShowRoundResultGameState(Globals, Votes);
     }
-    
-    public override GameStateMachine Next() => EndVoting();
 }
 
 public record ShowRoundResultGameState(
@@ -222,10 +209,7 @@ public record ShowRoundResultGameState(
     {
         UpdateSelected();
 
-        if (IsMafia ?? false)
-            Invoke(EndGame, Globals.TimeoutOptions.ShowRoundResultTimeout);
-        else
-            Invoke(NewRound, Globals.TimeoutOptions.ShowRoundResultTimeout);
+        Invoke(Next, Globals.TimeoutOptions.ShowRoundResultTimeout);
     }
 
     private void UpdateSelected()
@@ -249,24 +233,15 @@ public record ShowRoundResultGameState(
 
         Selected = Globals.Room.Players.FirstOrDefault(p => p.Id == selectedId);
     }
-
-    public override GameStateMachine EndGame()
-    {
-        if (IsMafia ?? false)
-            return new WinMafiaGameState(Globals);
-
-        return new WinPlayersGameState(Globals);
-    }
-
-    public override GameStateMachine NewRound()
+    
+    
+    public override GameStateMachine Next()
     {
         if (IsMafia ?? false)
             return new WinMafiaGameState(Globals);
         
         return new NewRoundGameState(Globals);
     }
-    
-    public override GameStateMachine Next() => NewRound();
 }
 
 public record WinPlayersGameState(GameStateGlobals Globals) : GameStateMachine(Globals)

@@ -42,11 +42,6 @@ const AdminPanel = observer(() => {
             <Tooltip title="Нажмите, чтобы скопировать">
                 <h4 className={styles.copyTooltip} onClick={onClickToCopy}>Комната: {game.room.id}</h4>
             </Tooltip>
-            <Button className={styles.adminButton} onClick={game.startGame}>Начать игру</Button>
-            <Button className={styles.adminButton} onClick={game.newRound}>Новый раунд</Button>
-            <Button className={styles.adminButton} onClick={game.showSecret}>Показать секрет</Button>
-            <Button className={styles.adminButton} onClick={game.startVoting}>Начать голосование</Button>
-            <Button className={styles.adminButton} onClick={game.endVoting}>Закончить голосование</Button>
             <Button className={styles.adminButton} onClick={game.nextState}>Next</Button>
         </Space>
     </Card>

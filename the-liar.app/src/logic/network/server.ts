@@ -20,16 +20,6 @@ export interface IEventsServer {
 
 export interface IAdminServer {
     nextState(room: string, currentPlayer: string): Promise<void>;
-
-    startGame(room: string, currentPlayer: string): Promise<void>;
-
-    newRound(room: string, currentPlayer: string): Promise<void>;
-
-    showSecret(room: string, currentPlayer: string): Promise<void>;
-
-    startVoting(room: string, currentPlayer: string): Promise<void>;
-
-    endVoting(room: string, currentPlayer: string): Promise<void>;
 }
 
 type TypedEventHandler = {
@@ -80,11 +70,6 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
         return await this.connection.invoke<string>('JoinRoom', room, username);
     }
 
-    async newRound(room: string, currentPlayer: string): Promise<void> {
-        console.log(`newRound: ${room} ${currentPlayer}`);
-        await this.connection.invoke('NewRound', room, currentPlayer);
-    }
-
     async nextState(room: string, currentPlayer: string): Promise<void> {
         console.log(`nextState: ${room} ${currentPlayer}`);
         await this.connection.invoke('NextState', room, currentPlayer);
@@ -106,30 +91,9 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
             disposed = true;
         };
     }
-
-    async showSecret(room: string, currentPlayer: string): Promise<void> {
-        console.log(`showSecret: ${room} ${currentPlayer}`);
-        await this.connection.invoke('ShowSecret', room, currentPlayer);
-    }
-
-    async startGame(room: string, currentPlayer: string): Promise<void> {
-        console.log(`Game start: ${room} ${currentPlayer}`);
-        await this.connection.invoke('StartGame', room, currentPlayer);
-    }
-
-    async startVoting(room: string, currentPlayer: string): Promise<void> {
-        console.log(`startVoting: ${room} ${currentPlayer}`);
-        await this.connection.invoke('StartVoting', room, currentPlayer);
-    }
-
     async vote(room: string, currentPlayer: string, target: string): Promise<void> {
         console.log(`Vote: ${room} ${currentPlayer} ${target}`);
         await this.connection.invoke('AddVote', room, currentPlayer, target);
-    }
-
-    async endVoting(room: string, currentPlayer: string): Promise<void> {
-        console.log(`endVoting: ${room} ${currentPlayer}`);
-        await this.connection.invoke('EndVoting', room, currentPlayer);
     }
 }
 
@@ -143,23 +107,8 @@ const fakseServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer = 
         console.log(`Game joined: ${room} ${username}`);
         return room;
     },
-    async startGame(room: string, currentPlayer: string): Promise<void> {
-        console.log(`Game start: ${room} ${currentPlayer}`);
-    },
     async vote(room: string, currentPlayer: string, target: string): Promise<void> {
         console.log(`Vote: ${room} ${currentPlayer} ${target}`);
-    },
-    async newRound(room: string, currentPlayer: string): Promise<void> {
-        console.log(`newRound: ${room} ${currentPlayer}`);
-    },
-    async showSecret(room: string, currentPlayer: string): Promise<void> {
-        console.log(`showSecret: ${room} ${currentPlayer}`);
-    },
-    async startVoting(room: string, currentPlayer: string): Promise<void> {
-        console.log(`startVoting: ${room} ${currentPlayer}`);
-    },
-    async endVoting(room: string, currentPlayer: string): Promise<void> {
-        console.log(`endVoting: ${room} ${currentPlayer}`);
     },
 
     async nextState(room: string, currentPlayer: string): Promise<void> {

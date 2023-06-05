@@ -69,34 +69,9 @@ public class GameHub : Hub<IHubUser>, IHubServer
         await _mediator.Send(new NextState.Request(roomId, playerId));
     }
 
-    public async Task StartGame(Guid roomId, Guid playerId)
-    {
-        await _mediator.Send(new StartGame.Request(roomId, playerId));
-    }
-
     public async Task AddVote(Guid roomId, Guid playerId, Guid targetId)
     {
         await _mediator.Send(new AddVote.Request(roomId, playerId, targetId));
-    }
-
-    public async Task NewRound(Guid roomId, Guid playerId)
-    {
-        await _mediator.Send(new NewRound.Request(roomId, playerId));
-    }
-
-    public async Task ShowSecret(Guid roomId, Guid playerId)
-    {
-        await _mediator.Send(new ShowSecret.Request(roomId, playerId));
-    }
-
-    public async Task StartVoting(Guid roomId, Guid playerId)
-    {
-        await _mediator.Send(new StartVoting.Request(roomId, playerId));
-    }
-
-    public async Task EndVoting(Guid roomId, Guid playerId)
-    {
-        await _mediator.Send(new EndVoting.Request(roomId, playerId));
     }
 
 

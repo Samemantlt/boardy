@@ -13,38 +13,6 @@ export type Secret = {
     text: string;
 }
 
-export class AdminControls {
-    playerId: string;
-    roomId: string;
-
-
-    constructor(roomId: string, playerId: string) {
-        this.roomId = roomId;
-        this.playerId = playerId;
-    }
-
-
-    async startGame() {
-        await server.startGame(this.roomId, this.playerId);
-    }
-
-    async newRound() {
-        await server.newRound(this.roomId, this.playerId);
-    }
-
-    async showSecret() {
-        await server.showSecret(this.roomId, this.playerId);
-    }
-
-    async startVoting() {
-        await server.startVoting(this.roomId, this.playerId);
-    }
-
-    async endVoting() {
-        await server.endVoting(this.roomId, this.playerId);
-    }
-}
-
 export enum GameStateType {
     NotStarted,
     NewRound,
@@ -196,28 +164,8 @@ export class Game {
         this.admin = false;
     }
 
-    async startGame() {
-        await server.startGame(this.room.id, this.room.getLocal().id);
-    }
-
-    async newRound() {
-        await server.newRound(this.room.id, this.room.getLocal().id);
-    }
-
-    async endVoting() {
-        await server.endVoting(this.room.id, this.room.getLocal().id);
-    }
-
     async nextState() {
         await server.nextState(this.room.id, this.room.getLocal().id);
-    }
-
-    async startVoting() {
-        await server.startVoting(this.room.id, this.room.getLocal().id);
-    }
-
-    async showSecret() {
-        await server.showSecret(this.room.id, this.room.getLocal().id);
     }
 
     private onRoomUpdated(event: RoomUpdated) {
