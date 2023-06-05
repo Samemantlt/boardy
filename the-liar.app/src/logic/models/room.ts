@@ -123,7 +123,12 @@ export class Room {
             return 'Проголосуйте';
 
         if (this.state?.name == GameStateType.ShowRoundResult)
+        {
+            if (this.state.selected == null)
+                return 'Никого в итоге не выбрали';
+
             return `${this.state.selected.name} мафия? ${this.state.isMafia ? 'Да' : 'Нет'}`
+        }
 
         if (this.state?.name == GameStateType.WinPlayers)
             return `Победили игроки`
