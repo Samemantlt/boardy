@@ -128,11 +128,18 @@ public class GameStateGlobalsSource
         return new GameStateGlobals(
             Room,
             new GameStateTimeoutOptions(
+                TimeSpan.FromSeconds(8),
+                TimeSpan.FromSeconds(8),
+                TimeSpan.FromSeconds(8),
+                TimeSpan.FromSeconds(8)
+            ),
+            /*
+            new GameStateTimeoutOptions(
                 TimeSpan.FromSeconds(45),
                 TimeSpan.FromSeconds(90),
                 TimeSpan.FromSeconds(15),
                 TimeSpan.FromSeconds(90)
-            ),
+            ),*/
             RaiseEvent,
             CreateSecret
         );

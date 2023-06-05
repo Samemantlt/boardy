@@ -47,5 +47,7 @@ public class InvokeHandler : INotificationHandler<Invoke>
         
         if (room.GameStateMachine == notification.Sender)
             room.Invoke(notification.Func);
+
+        _repository.Save(room);
     }
 }
