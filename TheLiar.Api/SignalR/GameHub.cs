@@ -82,6 +82,12 @@ public class GameHub : Hub<IHubUser>, IHubServer
         await _mediator.Send(new AddVote.Request(roomId, playerId, targetId));
     }
 
+    public async Task<List<PublicRoomInfo>> GetPublicRooms()
+    {
+        var result = await _mediator.Send(new GetPublicRooms.Request());
+        return result.PublicRooms;
+    }
+
 
     public string GroupName(Guid roomId) => $"Room_{roomId}";
 

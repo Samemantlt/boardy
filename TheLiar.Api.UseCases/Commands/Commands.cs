@@ -162,3 +162,26 @@ public static partial class NextState
         }
     }
 }
+
+public static partial class GetPublicRooms
+{
+    public record Request() : IRequest<Response>;
+
+    public record Response(List<PublicRoomInfo> PublicRooms);
+    
+    
+    public class Handler : IRequestHandler<Request, Response>
+    {
+        private readonly IRoomRepository _roomRepository;
+        
+        public Handler(IRoomRepository roomRepository)
+        {
+            _roomRepository = roomRepository;
+        }
+        
+        public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
+        {
+            return new Response(await _roomRepository.GetAllPublicRooms());
+        }
+    }
+}

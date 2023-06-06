@@ -25,6 +25,14 @@ public class RoomRepository : IRoomRepository
         return _rooms.First(p => p.Id == id);
     }
 
+    public async ValueTask<List<PublicRoomInfo>> GetAllPublicRooms()
+    {
+        return _rooms
+            .Where(p => p.IsPublic)
+            .Select(p => new PublicRoomInfo(p.Id, p.Admin.Name, p.Players.Count))
+            .ToList();
+    }
+
     public void Save(Room room)
     {
         room.PublishEventsAndClear(_mediator);

@@ -45,7 +45,7 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
             .build();
 
         this.connection.on('Raise', this.handleEvent);
-        this.connection.start().then(r => this.connected = true, e => {
+        this.connection.start().then(_ => this.connected = true, e => {
             console.error('Connecting error', e);
         });
     }
@@ -102,14 +102,9 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
 
     async getPublicRooms(): Promise<GameRoom[]> {
         console.log(`getPublicRooms`);
-
-        function fakeRoom(){
-            return {
-                id: Math.random().toString(),
-                adminName: Math.random().toString(),
-                playersCount: Math.ceil(Math.random() * 10),
-            }
-        }
+        return await this.connection.invoke<GameRoom[]>('GetPublicRooms');
+    }
+}
 
 
 const fakeServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer & IServer = {
@@ -149,12 +144,13 @@ const fakeServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer & I
             }
         }
 
-        return [
-            fakeRoom(),
-            fakeRoom(),
-            fakeRoom(),
-            fakeRoom()
-        ]
+        let output = [];
+
+        for (let i = 0; i < 100; i++) {
+            output.push(fakeRoom());
+        }
+
+        return output;
     }
 }
 

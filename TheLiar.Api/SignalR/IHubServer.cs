@@ -12,4 +12,6 @@ public interface IHubServer
     Task AddVote(Guid roomId, Guid playerId, Guid targetId);
     
     Task NextState(Guid roomId, Guid playerId);
+    
+    Task<List<PublicRoomInfo>> GetPublicRooms();
 }
