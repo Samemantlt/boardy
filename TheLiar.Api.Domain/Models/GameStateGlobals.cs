@@ -7,4 +7,5 @@ public record GameStateGlobals(
     Room Room,
     TimeoutOptions TimeoutOptions,
     Action<IEvent> RaiseEvent,
-    Func<ISecret> CreateSecret);
+    Func<ISecret> CreateSecret
+);

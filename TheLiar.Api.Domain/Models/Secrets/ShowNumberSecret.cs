@@ -2,5 +2,5 @@
 
 public record ShowNumberSecret(string Text) : ISecret
 {
-    public SecretType Type => SecretType.HandUp;
+    public SecretType Type => SecretType.ShowNumber;
 }

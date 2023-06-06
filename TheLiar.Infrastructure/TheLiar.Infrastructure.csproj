@@ -11,4 +11,20 @@
       <ProjectReference Include="..\TheLiar.Api.UseCases\TheLiar.Api.UseCases.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="hands_up.questions.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="point_smb.questions.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="show_number.questions.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    </ItemGroup>
+
 </Project>

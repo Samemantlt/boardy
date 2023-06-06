@@ -4,6 +4,7 @@ using TheLiar.Api.Domain.Extensions;
 using TheLiar.Api.Domain.Models;
 using TheLiar.Api.Domain.Models.StateMachine;
 using TheLiar.Api.Domain.Repositories;
+using TheLiar.Api.Domain.Services;
 
 namespace TheLiar.Api.UseCases.Commands;
 
@@ -51,11 +52,13 @@ public static partial class CreateRoom
     public class Handler : IRequestHandler<Request, Response>
     {
         private readonly IRoomRepository _roomRepository;
+        private readonly ISecretSource _secretSource;
 
 
-        public Handler(IRoomRepository roomRepository)
+        public Handler(IRoomRepository roomRepository, ISecretSource secretSource)
         {
             _roomRepository = roomRepository;
+            _secretSource = secretSource;
         }
 
 
@@ -65,7 +68,8 @@ public static partial class CreateRoom
                 request.RoomId,
                 new Player(request.PlayerName, request.ConnectionId),
                 request.TimeoutOptions,
-                request.IsPublic
+                request.IsPublic,
+                _secretSource
             );
             _roomRepository.Save(room);
 

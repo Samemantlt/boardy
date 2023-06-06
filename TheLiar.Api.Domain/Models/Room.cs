@@ -1,39 +1,12 @@
 ﻿using System.Collections;
 using System.Globalization;
 using Boardy.Domain.Core;
-using Boardy.Domain.Core.Events;
 using MediatR;
 using TheLiar.Api.Domain.Events;
-using TheLiar.Api.Domain.Models.Secrets;
 using TheLiar.Api.Domain.Models.StateMachine;
+using TheLiar.Api.Domain.Services;
 
 namespace TheLiar.Api.Domain.Models;
-
-public class Player
-{
-    public Guid Id { get; } = Guid.NewGuid();
-    public string Name { get; private set; }
-    public string ConnectionId { get; }
-    public bool IsMafia { get; private set; }
-
-
-    public Player(string name, string connectionId)
-    {
-        Name = name;
-        ConnectionId = connectionId;
-    }
-
-
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
-    }
-
-    public void SetMafia()
-    {
-        IsMafia = true;
-    }
-}
 
 public class Room : EntityBase
 {
@@ -52,10 +25,17 @@ public class Room : EntityBase
     public GameStateGlobals Globals { get; set; }
     
 
-    public Room(Guid id, Player admin, TimeoutOptions timeoutOptions, bool isPublic)
+    public Room(
+        Guid id,
+        Player admin,
+        TimeoutOptions timeoutOptions,
+        bool isPublic,
+        ISecretSource secretSource
+        )
     {
         _timeoutOptions = timeoutOptions;
-        
+        _secretSource = secretSource;
+
         Id = id;
         Admin = admin;
         IsPublic = isPublic;
@@ -107,7 +87,12 @@ public class Room : EntityBase
 
     private GameStateGlobals CreateGlobals()
     {
-        return new GameStateGlobalsSource(this, _timeoutOptions).Build();
+        return new GameStateGlobals(
+            this,
+            _timeoutOptions,
+            RaiseEvent,
+            _secretSource.RandomSecret
+        );
     }
 
     private void RaiseRoomUpdated()
@@ -117,52 +102,6 @@ public class Room : EntityBase
 
 
     private readonly TimeoutOptions _timeoutOptions;
+    private readonly ISecretSource _secretSource;
     private readonly List<Player> _players = new List<Player>();
-}
-
-public class GameStateGlobalsSource
-{
-    public Room Room { get; }
-    public TimeoutOptions TimeoutOptions { get; }
-
-
-    public GameStateGlobalsSource(Room room, TimeoutOptions timeoutOptions)
-    {
-        Room = room;
-        TimeoutOptions = timeoutOptions;
-    }
-    
-
-    public GameStateGlobals Build()
-    {
-        return new GameStateGlobals(
-            Room,
-            TimeoutOptions,
-            /*
-            new GameStateTimeoutOptions(
-                TimeSpan.FromSeconds(8),
-                TimeSpan.FromSeconds(8),
-                TimeSpan.FromSeconds(8),
-                TimeSpan.FromSeconds(8)
-            ),
-            new GameStateTimeoutOptions(
-                TimeSpan.FromSeconds(30),
-                TimeSpan.FromSeconds(90),
-                TimeSpan.FromSeconds(15),
-                TimeSpan.FromSeconds(90)
-            ),*/
-            RaiseEvent,
-            CreateSecret
-        );
-    }
-
-    private ISecret CreateSecret()
-    {
-        return new HandUpSecret("Is this the secret?");
-    }
-    
-    private void RaiseEvent(IEvent @event)
-    {
-        Room.RaiseEvent(@event);
-    }
 }

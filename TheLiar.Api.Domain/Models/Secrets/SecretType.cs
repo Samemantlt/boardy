@@ -3,6 +3,6 @@
 public enum SecretType
 {
     HandUp,
-    PointSmb,
+    PointSomebody,
     ShowNumber
 }

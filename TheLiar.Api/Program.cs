@@ -7,6 +7,7 @@ using TheLiar.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddInfrastructure();
 
 builder.Services.AddLazy<GameHub>();
 builder.Services.RegisterPolymorphicNotificationHandler<IPublicEvent, PublicEventSender>(ServiceLifetime.Singleton);
