@@ -39,39 +39,39 @@ export type RoomUpdated = {
 
 
 export type NotStarted = {
-    name: GameStateType.NotStarted;
+    type: GameStateType.NotStarted;
 };
 
 export type NewRound = {
-    name: GameStateType.NewRound;
+    type: GameStateType.NewRound;
     secret: Secret;
 };
 
 export type ShowSecret = {
-    name: GameStateType.ShowSecret;
+    type: GameStateType.ShowSecret;
     secret: Secret;
 };
 
 export type Voting = {
-    name: GameStateType.Voting;
+    type: GameStateType.Voting;
     votes: {
         [player: string]: string
     }
 };
 
 export type ShowRoundResult = {
-    name: GameStateType.ShowRoundResult;
+    type: GameStateType.ShowRoundResult;
     votes: { [player: string]: string }
     selected?: Player;
     isMafia?: boolean;
 };
 
 export type WinMafia = {
-    name: GameStateType.WinMafia;
+    type: GameStateType.WinMafia;
 };
 
 export type WinPlayers = {
-    name: GameStateType.WinPlayers;
+    type: GameStateType.WinPlayers;
 };
 
 

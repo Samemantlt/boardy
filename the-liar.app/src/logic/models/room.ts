@@ -106,23 +106,23 @@ export class Room {
     }
 
     getMainText(): string {
-        if (this.state?.name == GameStateType.NotStarted)
+        if (this.state?.type == GameStateType.NotStarted)
             return "Ожидание начала игры";
 
-        if (this.state?.name == GameStateType.NewRound) {
+        if (this.state?.type == GameStateType.NewRound) {
             if (!this.getLocal().isMafia)
                 return this.state.secret.text;
             else
                 return 'Вы лжец. Сделайте то же что и окружающие. Не попадитесь'
         }
 
-        if (this.state?.name == GameStateType.ShowSecret)
+        if (this.state?.type == GameStateType.ShowSecret)
             return `Секрет: ${this.state.secret.text}\nОбсудите с другими игроками`
 
-        if (this.state?.name == GameStateType.Voting)
+        if (this.state?.type == GameStateType.Voting)
             return 'Проголосуйте';
 
-        if (this.state?.name == GameStateType.ShowRoundResult)
+        if (this.state?.type == GameStateType.ShowRoundResult)
         {
             if (this.state.selected == null)
                 return 'Никого в итоге не выбрали';
@@ -130,10 +130,10 @@ export class Room {
             return `${this.state.selected.name} мафия? ${this.state.isMafia ? 'Да' : 'Нет'}`
         }
 
-        if (this.state?.name == GameStateType.WinPlayers)
+        if (this.state?.type == GameStateType.WinPlayers)
             return `Победили игроки`
 
-        if (this.state?.name == GameStateType.WinMafia)
+        if (this.state?.type == GameStateType.WinMafia)
             return `Победил лжец`
 
         return 'Ожидание подключения';
@@ -183,7 +183,7 @@ export class Game {
         this.room.id = event.roomId;
         this.room.players = event.players;
         this.room.state = event.state;
-        this.room.timer.updateTimeouts(event.timeoutOptions, event.state.name);
+        this.room.timer.updateTimeouts(event.timeoutOptions, event.state.type);
     }
 
     private onGameStarted(event: GameStarted) {

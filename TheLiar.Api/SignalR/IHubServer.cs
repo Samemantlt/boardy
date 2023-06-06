@@ -5,7 +5,7 @@ namespace TheLiar.Api.SignalR;
 
 public interface IHubServer
 {
-    Task<Guid> CreateRoom(string playerName, GameStateTimeoutOptions timeoutOptions, bool isPublic);
+    Task<Guid> CreateRoom(string playerName, TimeoutOptions timeoutOptions, bool isPublic);
     
     Task<Guid> JoinRoom(Guid roomId, string playerName);
     

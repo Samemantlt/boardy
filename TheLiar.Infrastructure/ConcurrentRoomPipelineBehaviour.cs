@@ -45,7 +45,7 @@ public class InvokeHandler : INotificationHandler<Invoke>
         
         await Task.Delay(notification.InvokeAfter ?? TimeSpan.Zero, cancellationToken);
         
-        if (room.GameStateMachine == notification.Sender)
+        if (room.GameState == notification.Sender)
             room.Invoke(notification.Func);
 
         _repository.Save(room);

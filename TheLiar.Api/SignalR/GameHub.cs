@@ -46,7 +46,7 @@ public class GameHub : Hub<IHubUser>, IHubServer
     }
 
 
-    public async Task<Guid> CreateRoom(string playerName, GameStateTimeoutOptions timeoutOptions, bool isPublic)
+    public async Task<Guid> CreateRoom(string playerName, TimeoutOptions timeoutOptions, bool isPublic)
     {
         var roomId = Guid.NewGuid();
 

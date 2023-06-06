@@ -4,6 +4,7 @@ using Boardy.Domain.Core;
 using Boardy.Domain.Core.Events;
 using MediatR;
 using TheLiar.Api.Domain.Events;
+using TheLiar.Api.Domain.Models.Secrets;
 using TheLiar.Api.Domain.Models.StateMachine;
 
 namespace TheLiar.Api.Domain.Models;
@@ -46,12 +47,12 @@ public class Room : EntityBase
 
     public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
-    public GameStateMachine GameStateMachine { get; private set; }
+    public GameState GameState { get; private set; }
 
     public GameStateGlobals Globals { get; set; }
     
 
-    public Room(Guid id, Player admin, GameStateTimeoutOptions timeoutOptions, bool isPublic)
+    public Room(Guid id, Player admin, TimeoutOptions timeoutOptions, bool isPublic)
     {
         _timeoutOptions = timeoutOptions;
         
@@ -60,7 +61,7 @@ public class Room : EntityBase
         IsPublic = isPublic;
 
         Globals = CreateGlobals();
-        GameStateMachine = new NotStartedGameState(Globals);
+        GameState = new NotStartedGameState(Globals);
         
         AddPlayer(admin);
     }
@@ -90,18 +91,18 @@ public class Room : EntityBase
         RaiseRoomUpdated();
     }
     
-    private void InvokeInStateMachine(GameStateMachine sender, Func<GameStateMachine> func)
+    private void InvokeInStateMachine(GameState sender, Func<GameState> func)
     {
-        if (GameStateMachine != sender)
+        if (GameState != sender)
             return;
 
-        GameStateMachine = func();
+        GameState = func();
         RaiseRoomUpdated();
     }
     
-    public void Invoke(Func<GameStateMachine> func)
+    public void Invoke(Func<GameState> func)
     {
-        InvokeInStateMachine(GameStateMachine!, func);
+        InvokeInStateMachine(GameState!, func);
     }
 
     private GameStateGlobals CreateGlobals()
@@ -111,21 +112,21 @@ public class Room : EntityBase
 
     private void RaiseRoomUpdated()
     {
-        RaiseEvent(new RoomUpdated(Id, Players, GameStateMachine, Globals.TimeoutOptions));
+        RaiseEvent(new RoomUpdated(Id, Players, GameState, Globals.TimeoutOptions));
     }
 
 
-    private readonly GameStateTimeoutOptions _timeoutOptions;
+    private readonly TimeoutOptions _timeoutOptions;
     private readonly List<Player> _players = new List<Player>();
 }
 
 public class GameStateGlobalsSource
 {
     public Room Room { get; }
-    public GameStateTimeoutOptions TimeoutOptions { get; }
+    public TimeoutOptions TimeoutOptions { get; }
 
 
-    public GameStateGlobalsSource(Room room, GameStateTimeoutOptions timeoutOptions)
+    public GameStateGlobalsSource(Room room, TimeoutOptions timeoutOptions)
     {
         Room = room;
         TimeoutOptions = timeoutOptions;
@@ -157,7 +158,7 @@ public class GameStateGlobalsSource
 
     private ISecret CreateSecret()
     {
-        return new BoolQuestionSecret("Is this the secret?");
+        return new HandUpSecret("Is this the secret?");
     }
     
     private void RaiseEvent(IEvent @event)

@@ -9,7 +9,7 @@ import React from "react";
 const PlayerCard = observer(({player}:{
     player: Player
 }) => {
-    let isVoting = game.room.state?.name === GameStateType.Voting;
+    let isVoting = game.room.state?.type === GameStateType.Voting;
 
     async function onCardClick(){
         await game.room.addVote(player.id);

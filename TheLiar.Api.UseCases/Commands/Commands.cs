@@ -41,7 +41,7 @@ public static partial class CreateRoom
         Guid RoomId,
         string PlayerName,
         string ConnectionId,
-        GameStateTimeoutOptions TimeoutOptions,
+        TimeoutOptions TimeoutOptions,
         bool IsPublic
     ) : IRequest<Response>;
 
@@ -123,10 +123,10 @@ public static partial class AddVote
         {
             var room = await _roomRepository.Get(request.RoomId);
 
-            if (room.GameStateMachine == null)
+            if (room.GameState == null)
                 throw new Exception("Game not started");
 
-            room.Invoke(() => room.GameStateMachine.AddVote(request.PlayerId, request.TargetId));
+            room.Invoke(() => room.GameState.AddVote(request.PlayerId, request.TargetId));
 
             _roomRepository.Save(room);
         }
@@ -153,10 +153,10 @@ public static partial class NextState
         {
             var room = await _roomRepository.Get(request.RoomId);
 
-            if (room.GameStateMachine == null)
+            if (room.GameState == null)
                 throw new Exception("Game not started");
 
-            room.Invoke(room.GameStateMachine.Next);
+            room.Invoke(room.GameState.Next);
 
             _roomRepository.Save(room);
         }
