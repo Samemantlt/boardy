@@ -157,15 +157,17 @@ export class Game {
     }
 
 
-    async createRoom(username: string) {
+    setName(username: string){
         this.localPlayerName = username;
-        await server.createRoom(username);
+    }
+
+    async createRoom() {
+        await server.createRoom(this.localPlayerName);
         this.admin = true;
     }
 
-    async joinRoom(username: string, room: string) {
-        this.localPlayerName = username;
-        await server.joinRoom(username, room);
+    async joinRoom(room: string) {
+        await server.joinRoom(this.localPlayerName, room);
         this.admin = false;
     }
 

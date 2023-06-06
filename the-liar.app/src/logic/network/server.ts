@@ -1,5 +1,5 @@
 import {HubConnectionBuilder, HubConnection} from "@microsoft/signalr";
-import {PublicEvent, PublicEventHandler} from 'logic/models/events';
+import {GameRoom, PublicEvent, PublicEventHandler} from 'logic/models/events';
 import {makeAutoObservable} from "mobx";
 import removeItem from "../../helpers/array";
 
@@ -7,11 +7,12 @@ export interface IJoinServer {
     createRoom(username: string): Promise<string>;
 
     joinRoom(username: string, room: string): Promise<string>;
+
+    getPublicRooms(): Promise<GameRoom[]>;
 }
 
 export interface IPlayerServer {
     vote(room: string, currentPlayer: string, target: string): Promise<void>;
-
 }
 
 export interface IEventsServer {
@@ -95,6 +96,27 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
         console.log(`Vote: ${room} ${currentPlayer} ${target}`);
         await this.connection.invoke('AddVote', room, currentPlayer, target);
     }
+
+    async getPublicRooms(): Promise<GameRoom[]> {
+        console.log(`getPublicRooms`);
+
+        function fakeRoom(){
+            return {
+                id: Math.random().toString(),
+                adminName: Math.random().toString(),
+                playersCount: Math.ceil(Math.random() * 10),
+            }
+        }
+
+        let output = [];
+
+        for (let i = 0; i < 100; i++) {
+            output.push(fakeRoom());
+        }
+
+        return output;
+        await this.connection.invoke('GetPublicRooms');
+    }
 }
 
 
@@ -121,6 +143,25 @@ const fakseServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer = 
         return () => {
             console.log(`Unsubscribed: ${eventType}`, handler)
         };
+    },
+
+    async getPublicRooms(): Promise<GameRoom[]> {
+        console.log(`getPublicRooms`);
+
+        function fakeRoom(){
+            return {
+                id: Math.random().toString(),
+                adminName: Math.random().toString(),
+                playersCount: Math.ceil(Math.random() * 10),
+            }
+        }
+
+        return [
+            fakeRoom(),
+            fakeRoom(),
+            fakeRoom(),
+            fakeRoom()
+        ]
     }
 }
 

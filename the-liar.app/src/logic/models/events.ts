@@ -15,6 +15,12 @@ export type RoomClosed = {
     roomId: string;
 };
 
+export type GameRoom = {
+    id: string;
+    playersCount: number;
+    adminName: string;
+}
+
 export type GameState = NotStarted | NewRound | ShowSecret | Voting | ShowRoundResult | WinMafia | WinPlayers;
 
 export type TimeoutOptions = {

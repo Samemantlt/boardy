@@ -1,0 +1,69 @@
+.cardContainer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.centeredCard {
+  width: 65em;
+  margin-top: 1em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 1000px) {
+  .centeredCard {
+    width: min-content;
+    height: min-content;
+  }
+}
+
+@media (max-height: 800px) {
+  .centeredCard {
+    margin-top: 0.5em;
+  }
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+
+.cardBodyTable {
+  width: 100%;
+}
+
+@media (max-width: 1000px) {
+  .cardBodyTable {
+    width: min-content;
+  }
+}
+
+.menu {
+  margin-left: 2em;
+  width: 20em;
+}
+
+.menu * {
+  width: 100%;
+}
+
+.rawConnectForm {
+  width: 100%;
+}
+
+.rawConnectForm > * {
+  width: 100%;
+}
+
+.buttons {
+  width: 100%;
+  display: flex;
+}
+
+.buttons > button {
+  width: 50%;
+}

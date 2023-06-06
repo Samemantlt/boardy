@@ -1,3 +1,9 @@
-.centered {
-  margin: auto auto;
+.content {
+  margin: 5rem auto;
+  width: 20rem;
+}
+
+.content * {
+  width: 100%;
+  text-align: center;
 }
