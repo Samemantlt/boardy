@@ -2,6 +2,7 @@ import {HubConnectionBuilder, HubConnection} from "@microsoft/signalr";
 import {GameRoom, PublicEvent, PublicEventHandler, TimeoutOptions} from 'logic/models/events';
 import {makeAutoObservable} from "mobx";
 import removeItem from "../../helpers/array";
+import * as dayjs from "dayjs";
 
 export interface IServer {
     connected: boolean;
@@ -102,7 +103,14 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
 
     async getPublicRooms(): Promise<GameRoom[]> {
         console.log(`getPublicRooms`);
-        return await this.connection.invoke<GameRoom[]>('GetPublicRooms');
+
+        const rooms = await this.connection.invoke<GameRoom[]>('GetPublicRooms');
+        return rooms.map(r => ({
+            id: r.id,
+            adminName: r.adminName,
+            playersCount: r.playersCount,
+            created: dayjs(r.created).format('DD.MM HH:mm:ss'),
+        }));
     }
 }
 

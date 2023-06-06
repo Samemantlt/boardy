@@ -29,7 +29,8 @@ public class RoomRepository : IRoomRepository
     {
         return _rooms
             .Where(p => p.IsPublic)
-            .Select(p => new PublicRoomInfo(p.Id, p.Admin.Name, p.Players.Count))
+            .Select(p => new PublicRoomInfo(p.Id, p.Admin.Name, p.Players.Count, p.Created))
+            .OrderByDescending(p => p.Created)
             .ToList();
     }
 

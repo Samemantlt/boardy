@@ -24,6 +24,8 @@ public class Room : EntityBase
 
     public GameStateGlobals Globals { get; set; }
     
+    public DateTime Created { get; } = DateTime.UtcNow;
+    
 
     public Room(
         Guid id,

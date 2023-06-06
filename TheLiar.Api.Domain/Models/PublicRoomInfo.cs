@@ -3,5 +3,6 @@
 public record PublicRoomInfo(
     Guid Id,
     string AdminName,
-    int PlayersCount
+    int PlayersCount,
+    DateTime Created
 );

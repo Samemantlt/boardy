@@ -11,23 +11,6 @@ import {useNavigate } from "react-router-dom";
 import useTime from "../../hooks/useTime";
 
 
-const columns = [
-    {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-    },
-    {
-        title: 'Admin',
-        dataIndex: 'adminName',
-        key: 'adminName',
-    },
-    {
-        title: 'Players',
-        dataIndex: 'playersCount',
-        key: 'playersCount',
-    },
-];
 
 
 const RoomListPage = observer(() => {
@@ -45,6 +28,46 @@ const RoomListPage = observer(() => {
 
     const [roomId, setRoomId] = useState<string>('');
 
+
+    async function onRowConnectClick(id: string){
+        setRoomId(id);
+        try {
+            await game.joinRoom(id);
+            navigate('/');
+        } catch (e) {
+            alert(`Error: ${e}`)
+        }
+    }
+
+    const columns = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
+            title: 'Админ',
+            dataIndex: 'adminName',
+            key: 'adminName',
+        },
+        {
+            title: 'Игроки',
+            dataIndex: 'playersCount',
+            key: 'playersCount',
+        },
+        {
+            title: 'Создано',
+            dataIndex: 'created',
+            key: 'created',
+        },
+        {
+            title: 'Кнопки',
+            key: 'actions',
+            render: (_, record) => (
+                <a onClick={() => onRowConnectClick(record.id)}>Подключиться</a>
+            )
+        }
+    ];
 
     async function joinRoom() {
         try {

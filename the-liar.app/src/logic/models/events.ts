@@ -1,4 +1,5 @@
 import {Secret, Player, GameStateType} from "./room";
+import * as dayjs from "dayjs";
 
 
 export type PublicEvent = {
@@ -19,6 +20,7 @@ export type GameRoom = {
     id: string;
     playersCount: number;
     adminName: string;
+    created: string;
 }
 
 export type GameState = NotStarted | NewRound | ShowSecret | Voting | ShowRoundResult | WinMafia | WinPlayers;

@@ -4,8 +4,8 @@ import MainPage from "./pages/MainPage/MainPage";
 import game from "./logic/models/room";
 import RoomPage from "./pages/RoomPage/RoomPage";
 import {Route, Routes, useNavigate} from "react-router-dom";
-import CreateRoomPage from "./pages/CreateRoomPage/CreateRoomPage";
-import RoomListPage from "./pages/RoomListPage/RoomListPage";
+import CreateRoomPage from "pages/CreateRoomPage/CreateRoomPage";
+import RoomListPage from "pages/RoomListPage/RoomListPage";
 import server from "./logic/network/server";
 
 
