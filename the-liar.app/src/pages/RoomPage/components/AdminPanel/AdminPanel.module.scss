@@ -1,13 +1,12 @@
 .adminPanel {
   position: absolute;
-  bottom: 14rem;
+  bottom: 18rem;
   left: 1rem;
-  width: 25rem;
-  height: 6rem;
+  max-width: min(25rem, 93vw);
 }
 
 .adminButton {
-  width: 20rem;
+  width: 100%;
 }
 
 .copyTooltip {
