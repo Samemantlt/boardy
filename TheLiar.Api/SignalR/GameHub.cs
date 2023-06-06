@@ -3,6 +3,8 @@ using Boardy.Domain.Core.Events;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using TheLiar.Api.Domain.Events;
+using TheLiar.Api.Domain.Models;
+using TheLiar.Api.Domain.Models.StateMachine;
 using TheLiar.Api.UseCases.Commands;
 
 namespace TheLiar.Api.SignalR;
@@ -21,7 +23,7 @@ public class PublicEventSender : INotificationHandler<IPublicEvent>
     public async Task Handle(IPublicEvent notification, CancellationToken cancellationToken)
     {
         var hub = _gameHub();
-        
+
         await hub.Clients.Group(hub.GroupName(notification.RoomId))
             .Raise(new RaisedEvent(notification.GetType().Name, notification));
     }
@@ -44,13 +46,19 @@ public class GameHub : Hub<IHubUser>, IHubServer
     }
 
 
-    public async Task<Guid> CreateRoom(string playerName)
+    public async Task<Guid> CreateRoom(string playerName, GameStateTimeoutOptions timeoutOptions, bool isPublic)
     {
         var roomId = Guid.NewGuid();
-        
+
         await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(roomId));
-        
-        var result = await _mediator.Send(new CreateRoom.Request(roomId, playerName, Context.ConnectionId));
+
+        var result = await _mediator.Send(new CreateRoom.Request(
+            roomId,
+            playerName,
+            Context.ConnectionId,
+            timeoutOptions,
+            isPublic
+        ));
 
         return result.RoomId;
     }
@@ -58,7 +66,7 @@ public class GameHub : Hub<IHubUser>, IHubServer
     public async Task<Guid> JoinRoom(Guid roomId, string playerName)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(roomId));
-        
+
         var result = await _mediator.Send(new JoinRoom.Request(roomId, playerName, Context.ConnectionId));
 
         return result.RoomId;

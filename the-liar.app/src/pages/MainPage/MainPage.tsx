@@ -1,24 +1,21 @@
 import React, {useState} from "react";
-import {Button, Card, Form, Input, Space} from "antd";
+import {Button, Card, Input, Space} from "antd";
 import './MainPage.scss'
 import {observer} from "mobx-react-lite";
 import game from "logic/models/room";
-import RoomListPage from "../RoomListPage/RoomListPage";
+import {useNavigate} from "react-router-dom";
 
 
 const MainPage = observer(() => {
+    const navigate = useNavigate();
     const [name, setName] = useState(`Player${Math.ceil(Math.random() * 10000)}`)
-    const [continued, setContinued] = useState(false);
 
 
     function onContinueBtnClick() {
         game.setName(name);
-        setContinued(true);
+        navigate('/rooms');
     }
 
-
-    if (continued)
-        return <RoomListPage/>
 
     return <article>
         <div className="content">

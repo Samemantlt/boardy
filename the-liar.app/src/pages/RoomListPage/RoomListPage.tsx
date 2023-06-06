@@ -1,12 +1,14 @@
 import {observer} from "mobx-react-lite";
 import React, {useState} from "react";
-import {Button, Card, Row, Space, Table} from "antd";
+import {Button, Card, Table} from "antd";
 import styles from './RoomListPage.module.scss';
 import roomsList from "../../logic/models/roomsList";
 import useAsyncEffect from "use-async-effect";
 import {Input} from "antd/lib";
-import Media, {useMedia} from 'react-media';
+import {useMedia} from 'react-media';
 import game from "../../logic/models/room";
+import {useNavigate } from "react-router-dom";
+import useTime from "../../hooks/useTime";
 
 
 const columns = [
@@ -29,27 +31,25 @@ const columns = [
 
 
 const RoomListPage = observer(() => {
-    useAsyncEffect(async () => {
-        await roomsList.refresh();
-    }, []);
-
-    const [roomId, setRoomId] = useState<string>('');
+    const navigate = useNavigate();
+    const time = useTime(2_000);
 
     // TODO: Listen media queries in runtime
     const isSmallScreen = useMedia({query: "(max-width: 1000px)"});
 
 
+    useAsyncEffect(async () => {
+        await roomsList.refresh();
+    }, [time]);
+
+
+    const [roomId, setRoomId] = useState<string>('');
+
+
     async function joinRoom() {
         try {
             await game.joinRoom(roomId);
-        } catch (e) {
-            alert(`Error: ${e}`)
-        }
-    }
-
-    async function createRoom() {
-        try {
-            await game.createRoom();
+            navigate('/');
         } catch (e) {
             alert(`Error: ${e}`)
         }
@@ -69,7 +69,7 @@ const RoomListPage = observer(() => {
                     <Input placeholder="ID комнаты" value={roomId}
                            onInput={e => setRoomId(e.currentTarget.value)}/>
                     <div className={styles.buttons}>
-                        <Button onClick={createRoom}>Создать</Button>
+                        <Button onClick={() => navigate('/rooms/create')}>Создать</Button>
                         <Button onClick={joinRoom}>Подключиться</Button>
                     </div>
                 </div>

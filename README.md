@@ -6,5 +6,5 @@ One player randomly marked as a liar. Then everybody but liar can see an action 
 
 ##### Remaining goals:
 
- - Configure game options when create room
- - Add public rooms
+ - [x] Configure game options when create room
+ - [x] Add public rooms

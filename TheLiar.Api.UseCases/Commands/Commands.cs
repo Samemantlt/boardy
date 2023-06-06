@@ -37,7 +37,13 @@ public static partial class PlayerDisconnected
 
 public static partial class CreateRoom
 {
-    public record Request(Guid RoomId, string PlayerName, string ConnectionId) : IRequest<Response>;
+    public record Request(
+        Guid RoomId,
+        string PlayerName,
+        string ConnectionId,
+        GameStateTimeoutOptions TimeoutOptions,
+        bool IsPublic
+    ) : IRequest<Response>;
 
     public record Response(Guid RoomId);
 
@@ -55,7 +61,12 @@ public static partial class CreateRoom
 
         public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
         {
-            var room = new Room(request.RoomId, new Player(request.PlayerName, request.ConnectionId));
+            var room = new Room(
+                request.RoomId,
+                new Player(request.PlayerName, request.ConnectionId),
+                request.TimeoutOptions,
+                request.IsPublic
+            );
             _roomRepository.Save(room);
 
             return new Response(room.Id);

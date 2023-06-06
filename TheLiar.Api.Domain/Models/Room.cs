@@ -39,6 +39,8 @@ public class Room : EntityBase
     public Guid Id { get; }
 
     public Player Admin { get; }
+    
+    public bool IsPublic { get; }
 
     public Player Mafia => Players.Single(p => p.IsMafia);
 
@@ -49,10 +51,14 @@ public class Room : EntityBase
     public GameStateGlobals Globals { get; set; }
     
 
-    public Room(Guid id, Player admin)
+    public Room(Guid id, Player admin, GameStateTimeoutOptions timeoutOptions, bool isPublic)
     {
+        _timeoutOptions = timeoutOptions;
+        
         Id = id;
         Admin = admin;
+        IsPublic = isPublic;
+
         Globals = CreateGlobals();
         GameStateMachine = new NotStartedGameState(Globals);
         
@@ -100,7 +106,7 @@ public class Room : EntityBase
 
     private GameStateGlobals CreateGlobals()
     {
-        return new GameStateGlobalsSource(this).Build();
+        return new GameStateGlobalsSource(this, _timeoutOptions).Build();
     }
 
     private void RaiseRoomUpdated()
@@ -109,17 +115,20 @@ public class Room : EntityBase
     }
 
 
+    private readonly GameStateTimeoutOptions _timeoutOptions;
     private readonly List<Player> _players = new List<Player>();
 }
 
 public class GameStateGlobalsSource
 {
     public Room Room { get; }
+    public GameStateTimeoutOptions TimeoutOptions { get; }
 
-    
-    public GameStateGlobalsSource(Room room)
+
+    public GameStateGlobalsSource(Room room, GameStateTimeoutOptions timeoutOptions)
     {
         Room = room;
+        TimeoutOptions = timeoutOptions;
     }
     
 
@@ -127,15 +136,16 @@ public class GameStateGlobalsSource
     {
         return new GameStateGlobals(
             Room,
+            TimeoutOptions,
+            /*
             new GameStateTimeoutOptions(
                 TimeSpan.FromSeconds(8),
                 TimeSpan.FromSeconds(8),
                 TimeSpan.FromSeconds(8),
                 TimeSpan.FromSeconds(8)
             ),
-            /*
             new GameStateTimeoutOptions(
-                TimeSpan.FromSeconds(45),
+                TimeSpan.FromSeconds(30),
                 TimeSpan.FromSeconds(90),
                 TimeSpan.FromSeconds(15),
                 TimeSpan.FromSeconds(90)

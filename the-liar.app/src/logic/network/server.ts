@@ -1,10 +1,13 @@
 import {HubConnectionBuilder, HubConnection} from "@microsoft/signalr";
-import {GameRoom, PublicEvent, PublicEventHandler} from 'logic/models/events';
+import {GameRoom, PublicEvent, PublicEventHandler, TimeoutOptions} from 'logic/models/events';
 import {makeAutoObservable} from "mobx";
 import removeItem from "../../helpers/array";
 
+export interface IServer {
+    connected: boolean;
+}
 export interface IJoinServer {
-    createRoom(username: string): Promise<string>;
+    createRoom(username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string>;
 
     joinRoom(username: string, room: string): Promise<string>;
 
@@ -29,7 +32,7 @@ type TypedEventHandler = {
 }
 
 
-class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEventsServer {
+class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEventsServer, IServer {
     connection: HubConnection;
     handlers: TypedEventHandler[] = [];
     connected: boolean = false;
@@ -61,9 +64,9 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
         }
     }
 
-    async createRoom(username: string): Promise<string> {
+    async createRoom(username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string> {
         console.log(`Room created: ${username}`);
-        return await this.connection.invoke<string>('CreateRoom', username);
+        return await this.connection.invoke<string>('CreateRoom', username, timeoutOptions, isPublic);
     }
 
     async joinRoom(username: string, room: string): Promise<string> {
@@ -108,21 +111,11 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
             }
         }
 
-        let output = [];
 
-        for (let i = 0; i < 100; i++) {
-            output.push(fakeRoom());
-        }
-
-        return output;
-        await this.connection.invoke('GetPublicRooms');
-    }
-}
-
-
-const fakseServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer = {
-    async createRoom(username: string): Promise<string> {
-        console.log(`Room created: ${username}`);
+const fakeServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer & IServer = {
+    connected: true,
+    async createRoom(username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string> {
+        console.log(`Room created: ${username} ${timeoutOptions} ${isPublic}`);
         return Math.random().toString();
     },
     async joinRoom(username: string, room: string): Promise<string> {
@@ -165,6 +158,6 @@ const fakseServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer = 
     }
 }
 
-const server: IJoinServer & IAdminServer & IPlayerServer & IEventsServer = new SignalRServer();
+const server: IJoinServer & IAdminServer & IPlayerServer & IEventsServer & IServer = new SignalRServer();
 
 export default server;

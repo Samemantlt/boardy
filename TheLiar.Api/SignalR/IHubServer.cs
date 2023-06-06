@@ -1,8 +1,11 @@
-﻿namespace TheLiar.Api.SignalR;
+﻿using TheLiar.Api.Domain.Models;
+using TheLiar.Api.Domain.Models.StateMachine;
+
+namespace TheLiar.Api.SignalR;
 
 public interface IHubServer
 {
-    Task<Guid> CreateRoom(string playerName);
+    Task<Guid> CreateRoom(string playerName, GameStateTimeoutOptions timeoutOptions, bool isPublic);
     
     Task<Guid> JoinRoom(Guid roomId, string playerName);
     

@@ -161,8 +161,8 @@ export class Game {
         this.localPlayerName = username;
     }
 
-    async createRoom() {
-        await server.createRoom(this.localPlayerName);
+    async createRoom(timeoutOptions: TimeoutOptions, isPublic: boolean) {
+        await server.createRoom(this.localPlayerName, timeoutOptions, isPublic);
         this.admin = true;
     }
 

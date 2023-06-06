@@ -1,0 +1,23 @@
+.cardContainer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.centeredCard {
+  margin-top: 1em;
+  width: 30em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-height: 600px) {
+  .centeredCard {
+    margin-top: 8em;
+  }
+}
+
+label.formLabels {
+  white-space: normal;
+}
