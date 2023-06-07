@@ -62,7 +62,7 @@ export class GameTimer {
         this.refreshTimer(stateType);
     }
 
-    private refreshTimer(stateType: GameStateType){
+    private refreshTimer(stateType: GameStateType) {
         let duration = this.calcDuration(stateType);
 
         this.current = duration == undefined ? undefined : new TimerInfo(duration);
@@ -122,8 +122,7 @@ export class Room {
         if (this.state?.type == GameStateType.Voting)
             return 'Проголосуйте';
 
-        if (this.state?.type == GameStateType.ShowRoundResult)
-        {
+        if (this.state?.type == GameStateType.ShowRoundResult) {
             if (this.state.selected == null)
                 return 'Никого в итоге не выбрали';
 
@@ -144,6 +143,20 @@ export class Room {
     }
 }
 
+function generateFakePlayers() {
+    let o: Player[] = [];
+
+    for (let i = 0; i < 20; i++) {
+        o.push({
+            id: Math.ceil(Math.random() * 10000).toString(),
+            name: `Player${Math.ceil(Math.random() * 10000).toString()}`,
+            isMafia: false
+        })
+    }
+
+    return o;
+}
+
 export class Game {
     room?: Room;
     localPlayerName: string;
@@ -157,7 +170,7 @@ export class Game {
     }
 
 
-    setName(username: string){
+    setName(username: string) {
         this.localPlayerName = username;
     }
 
@@ -181,7 +194,7 @@ export class Game {
         }
 
         this.room.id = event.roomId;
-        this.room.players = event.players;
+        this.room.players = generateFakePlayers(); // event.players;
         this.room.state = event.state;
         this.room.timer.updateTimeouts(event.timeoutOptions, event.state.type);
     }
