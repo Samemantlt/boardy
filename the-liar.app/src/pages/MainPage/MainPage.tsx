@@ -8,7 +8,7 @@ import {useNavigate} from "react-router-dom";
 
 const MainPage = observer(() => {
     const navigate = useNavigate();
-    const [name, setName] = useState(`Player${Math.ceil(Math.random() * 10000)}`)
+    const [name, setName] = useState(game.localPlayerName ?? `Player${Math.ceil(Math.random() * 10000)}`)
 
 
     function onContinueBtnClick() {

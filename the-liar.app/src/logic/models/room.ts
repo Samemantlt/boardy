@@ -222,7 +222,6 @@ export class Game {
     private onRoomClosed(event: RoomClosed) {
         this.admin = false;
         this.room = null;
-        this.localPlayerName = null;
     }
 }
 
