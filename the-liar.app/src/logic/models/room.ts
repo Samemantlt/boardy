@@ -143,20 +143,6 @@ export class Room {
     }
 }
 
-function generateFakePlayers() {
-    let o: Player[] = [];
-
-    for (let i = 0; i < 20; i++) {
-        o.push({
-            id: Math.ceil(Math.random() * 10000).toString(),
-            name: `Player${Math.ceil(Math.random() * 10000).toString()}`,
-            isMafia: false
-        })
-    }
-
-    return o;
-}
-
 export class Game {
     room?: Room;
     localPlayerName: string;
@@ -194,7 +180,7 @@ export class Game {
         }
 
         this.room.id = event.roomId;
-        this.room.players = generateFakePlayers(); // event.players;
+        this.room.players = event.players;
         this.room.state = event.state;
         this.room.timer.updateTimeouts(event.timeoutOptions, event.state.type);
     }

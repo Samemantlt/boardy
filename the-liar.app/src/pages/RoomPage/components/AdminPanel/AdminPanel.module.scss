@@ -5,6 +5,13 @@
   max-width: min(25rem, 93vw);
 }
 
+@media (max-height: 50rem) {
+  .adminPanel {
+    bottom: initial;
+    top: 1rem;
+  }
+}
+
 .adminButton {
   width: 100%;
 }
