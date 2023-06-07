@@ -10,7 +10,7 @@ namespace TheLiar.Api.Domain.Models;
 
 public class Room : EntityBase
 {
-    public Guid Id { get; }
+    public string Id { get; }
 
     public Player Admin { get; }
     
@@ -21,6 +21,8 @@ public class Room : EntityBase
     public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
     public GameState GameState { get; private set; }
+    
+    public bool IsStarted => GameState is not NotStartedGameState;
 
     public GameStateGlobals Globals { get; set; }
     
@@ -28,7 +30,7 @@ public class Room : EntityBase
     
 
     public Room(
-        Guid id,
+        string id,
         Player admin,
         TimeoutOptions timeoutOptions,
         bool isPublic,

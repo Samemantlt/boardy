@@ -2,7 +2,7 @@
 
 public interface IPlayerInRoomRequest
 {
-    Guid RoomId { get; }
+    string RoomId { get; }
     
     Guid PlayerId { get; }
 }

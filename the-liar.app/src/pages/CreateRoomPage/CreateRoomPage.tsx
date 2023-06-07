@@ -1,7 +1,7 @@
 import {observer, useLocalStore} from "mobx-react-lite";
 import React from "react";
 import styles from "./CreateRoomPage.module.scss";
-import {Button, Card, Checkbox, Form, TimePicker} from "antd";
+import {Button, Card, Checkbox, Form, Input, TimePicker} from "antd";
 import {TimeoutOptions} from "../../logic/models/events";
 import 'dayjs';
 import * as dayjs from "dayjs";
@@ -22,6 +22,7 @@ const CreateRoomPage = observer(() => {
     }));
 
     const otherOptions = useLocalStore(() => ({
+        roomName: `Room${Math.ceil(Math.random() * 10_000)}`,
         isPublic: true
     }));
 
@@ -34,7 +35,7 @@ const CreateRoomPage = observer(() => {
         }
 
         try {
-            await game.createRoom(converted, otherOptions.isPublic);
+            await game.createRoom(otherOptions.roomName, converted, otherOptions.isPublic);
             navigate('/');
         } catch (e) {
             alert(`Error: ${e}`)
@@ -45,8 +46,12 @@ const CreateRoomPage = observer(() => {
     return <div className={styles.cardContainer}>
         <Card className={styles.centeredCard}>
             <Form labelWrap={true}
-                  labelCol={{span:16}}
+                  labelCol={{span: 16}}
                   wrapperCol={{span: 8}}>
+                <Form.Item label="Название комнаты">
+                    <Input onInput={(e) => otherOptions.roomName = e.currentTarget.value}
+                           value={otherOptions.roomName}/>
+                </Form.Item>
                 <Form.Item label="Ожидание в начале раунда">
                     <TimePicker onChange={(v, _) => timeoutOptions.newRoundTimeout = v}
                                 value={timeoutOptions.newRoundTimeout}/>

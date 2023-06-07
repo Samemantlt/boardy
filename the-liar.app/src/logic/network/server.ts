@@ -8,7 +8,7 @@ export interface IServer {
     connected: boolean;
 }
 export interface IJoinServer {
-    createRoom(username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string>;
+    createRoom(room: string, username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string>;
 
     joinRoom(username: string, room: string): Promise<string>;
 
@@ -65,9 +65,9 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
         }
     }
 
-    async createRoom(username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string> {
+    async createRoom(room: string, username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string> {
         console.log(`Room created: ${username}`);
-        return await this.connection.invoke<string>('CreateRoom', username, timeoutOptions, isPublic);
+        return await this.connection.invoke<string>('CreateRoom', room, username, timeoutOptions, isPublic);
     }
 
     async joinRoom(username: string, room: string): Promise<string> {
@@ -117,7 +117,7 @@ class SignalRServer implements IJoinServer, IAdminServer, IPlayerServer, IEvents
 
 const fakeServer: IJoinServer & IAdminServer & IPlayerServer & IEventsServer & IServer = {
     connected: true,
-    async createRoom(username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string> {
+    async createRoom(room: string, username: string, timeoutOptions: TimeoutOptions, isPublic: boolean): Promise<string> {
         console.log(`Room created: ${username} ${timeoutOptions} ${isPublic}`);
         return Math.random().toString();
     },

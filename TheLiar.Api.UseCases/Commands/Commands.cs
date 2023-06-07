@@ -39,14 +39,14 @@ public static partial class PlayerDisconnected
 public static partial class CreateRoom
 {
     public record Request(
-        Guid RoomId,
+        string RoomId,
         string PlayerName,
         string ConnectionId,
         TimeoutOptions TimeoutOptions,
         bool IsPublic
     ) : IRequest<Response>;
 
-    public record Response(Guid RoomId);
+    public record Response(string RoomId);
 
 
     public class Handler : IRequestHandler<Request, Response>
@@ -64,6 +64,8 @@ public static partial class CreateRoom
 
         public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
         {
+            await _roomRepository.AssertUniqueId(request.RoomId);
+            
             var room = new Room(
                 request.RoomId,
                 new Player(request.PlayerName, request.ConnectionId),
@@ -80,9 +82,9 @@ public static partial class CreateRoom
 
 public static partial class JoinRoom
 {
-    public record Request(Guid RoomId, string PlayerName, string ConnectionId) : IRequest<Response>;
+    public record Request(string RoomId, string PlayerName, string ConnectionId) : IRequest<Response>;
 
-    public record Response(Guid RoomId);
+    public record Response(string RoomId);
 
 
     public class Handler : IRequestHandler<Request, Response>
@@ -109,7 +111,7 @@ public static partial class JoinRoom
 
 public static partial class AddVote
 {
-    public record Request(Guid RoomId, Guid PlayerId, Guid TargetId) : IRequest;
+    public record Request(string RoomId, Guid PlayerId, Guid TargetId) : IRequest, IPlayerInRoomRequest;
 
 
     public class Handler : IRequestHandler<Request>
@@ -139,7 +141,7 @@ public static partial class AddVote
 
 public static partial class NextState
 {
-    public record Request(Guid RoomId, Guid PlayerId) : IRequest, IAdminRequest;
+    public record Request(string RoomId, Guid PlayerId) : IRequest, IAdminRequest;
 
 
     public class Handler : IRequestHandler<Request>

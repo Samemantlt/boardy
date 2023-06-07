@@ -3,6 +3,7 @@ using Boardy.Domain.Core.Events;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using TheLiar.Api.Domain.Events;
+using TheLiar.Api.Domain.Exceptions;
 using TheLiar.Api.Domain.Models;
 using TheLiar.Api.Domain.Models.StateMachine;
 using TheLiar.Api.UseCases.Commands;
@@ -46,24 +47,30 @@ public class GameHub : Hub<IHubUser>, IHubServer
     }
 
 
-    public async Task<Guid> CreateRoom(string playerName, TimeoutOptions timeoutOptions, bool isPublic)
+    public async Task<string> CreateRoom(string roomId, string playerName, TimeoutOptions timeoutOptions, bool isPublic)
     {
-        var roomId = Guid.NewGuid();
-
         await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(roomId));
 
-        var result = await _mediator.Send(new CreateRoom.Request(
-            roomId,
-            playerName,
-            Context.ConnectionId,
-            timeoutOptions,
-            isPublic
-        ));
+        try
+        {
+            var result = await _mediator.Send(new CreateRoom.Request(
+                roomId,
+                playerName,
+                Context.ConnectionId,
+                timeoutOptions,
+                isPublic
+            ));
 
-        return result.RoomId;
+            return result.RoomId;
+        }
+        catch (RoomAlreadyExistException)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(roomId));
+            throw;
+        }
     }
 
-    public async Task<Guid> JoinRoom(Guid roomId, string playerName)
+    public async Task<string> JoinRoom(string roomId, string playerName)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(roomId));
 
@@ -72,12 +79,12 @@ public class GameHub : Hub<IHubUser>, IHubServer
         return result.RoomId;
     }
 
-    public async Task NextState(Guid roomId, Guid playerId)
+    public async Task NextState(string roomId, Guid playerId)
     {
         await _mediator.Send(new NextState.Request(roomId, playerId));
     }
 
-    public async Task AddVote(Guid roomId, Guid playerId, Guid targetId)
+    public async Task AddVote(string roomId, Guid playerId, Guid targetId)
     {
         await _mediator.Send(new AddVote.Request(roomId, playerId, targetId));
     }
@@ -89,7 +96,7 @@ public class GameHub : Hub<IHubUser>, IHubServer
     }
 
 
-    public string GroupName(Guid roomId) => $"Room_{roomId}";
+    public string GroupName(string roomId) => $"Room_{roomId}";
 
 
     private const string PlayerKey = "player";

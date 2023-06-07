@@ -4,7 +4,7 @@ namespace Boardy.Domain.Core.Events;
 
 public interface IEvent : INotification
 {
-    public Guid RoomId { get; }
+    public string RoomId { get; }
 }
 
 public interface IPublicEvent : IEvent

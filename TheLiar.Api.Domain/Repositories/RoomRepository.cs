@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TheLiar.Api.Domain.Exceptions;
 using TheLiar.Api.Domain.Models;
 
 namespace TheLiar.Api.Domain.Repositories;
@@ -20,7 +21,7 @@ public class RoomRepository : IRoomRepository
         return _rooms.FirstOrDefault(p => p.Players.Any(player => player.ConnectionId == connectionId));
     }
 
-    public async ValueTask<Room> Get(Guid id)
+    public async ValueTask<Room> Get(string id)
     {
         return _rooms.First(p => p.Id == id);
     }
@@ -28,10 +29,22 @@ public class RoomRepository : IRoomRepository
     public async ValueTask<List<PublicRoomInfo>> GetAllPublicRooms()
     {
         return _rooms
+            .Where(p => !p.IsStarted)
             .Where(p => p.IsPublic)
             .Select(p => new PublicRoomInfo(p.Id, p.Admin.Name, p.Players.Count, p.Created))
             .OrderByDescending(p => p.Created)
             .ToList();
+    }
+
+    public async ValueTask AssertUniqueId(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(id));
+        
+        var exists = _rooms.Any(p => p.Id == id);
+        
+        if (exists)
+            throw new RoomAlreadyExistException(id);
     }
 
     public void Save(Room room)

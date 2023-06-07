@@ -5,23 +5,23 @@ using TheLiar.Api.Domain.Models.StateMachine;
 namespace TheLiar.Api.Domain.Events;
 
 public record RoomUpdated(
-    Guid RoomId,
+    string RoomId,
     IEnumerable<Player> Players,
     GameState State,
     TimeoutOptions TimeoutOptions
 ) : IPublicEvent;
 
 public record GameStarted(
-    Guid RoomId,
+    string RoomId,
     Guid MafiaId
 ) : IPublicEvent;
 
 public record RoomClosed(
-    Guid RoomId
+    string RoomId
 ) : IPublicEvent;
 
 public record Invoke(
-    Guid RoomId,
+    string RoomId,
     GameState Sender,
     Func<GameState> Func,
     TimeSpan? InvokeAfter = null
