@@ -5,9 +5,14 @@ import game from "../../../../logic/models/room";
 
 
 const SecretView = observer(() => {
-    return <div className={styles.secretView}>
-        {game.room.getMainText()}
-    </div>
+    return <>
+        <div className={styles.secretView}>
+            {game.room.getMainText()}
+            <div className={styles.subText}>
+                {game.room.getSecondaryText()}
+            </div>
+        </div>
+    </>
 })
 
 

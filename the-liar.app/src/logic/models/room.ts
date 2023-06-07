@@ -9,8 +9,16 @@ export type Player = {
     isMafia: boolean;
 }
 
+export enum SecretType {
+    HandUp,
+    PointSomebody,
+    ShowNumber
+}
+
+
 export type Secret = {
     text: string;
+    type: SecretType;
 }
 
 export enum GameStateType {
@@ -136,6 +144,23 @@ export class Room {
             return `Победил лжец`
 
         return 'Ожидание подключения';
+    }
+
+    getSecondaryText(): string | undefined {
+        if (this.state.type == GameStateType.ShowSecret || this.state.type == GameStateType.NewRound) {
+            switch (this.state.secret.type) {
+                case SecretType.HandUp:
+                    return "Режим: Подними руку"
+                case SecretType.PointSomebody:
+                    return "Режим: Укажи на игрока"
+                case SecretType.ShowNumber:
+                    return "Режим: Покажи число пальцами"
+                default:
+                    throw new Error(`Not supported secret type: ${this.state.secret.type}`)
+            }
+        }
+
+        return undefined;
     }
 
     async addVote(targetId: string) {
