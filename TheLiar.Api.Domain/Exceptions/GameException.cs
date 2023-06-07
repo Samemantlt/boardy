@@ -16,6 +16,18 @@ public class RoomAlreadyExistException : GameException
     }
 }
 
+public class GameAlreadyStartedException : GameException
+{
+    public string RoomId { get; }
+
+    public override string Message => $"Game already started. Room Id: {RoomId}";
+    
+    
+    public GameAlreadyStartedException(string roomId, Exception? inner = null) : base(null, inner)
+    {
+        RoomId = roomId;
+    }
+}
 
 public class GameException : Exception
 {

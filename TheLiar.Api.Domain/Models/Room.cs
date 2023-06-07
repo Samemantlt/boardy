@@ -3,6 +3,7 @@ using System.Globalization;
 using Boardy.Domain.Core;
 using MediatR;
 using TheLiar.Api.Domain.Events;
+using TheLiar.Api.Domain.Exceptions;
 using TheLiar.Api.Domain.Models.StateMachine;
 using TheLiar.Api.Domain.Services;
 
@@ -53,6 +54,9 @@ public class Room : EntityBase
     
     public void AddPlayer(Player player)
     {
+        if (IsStarted)
+            throw new GameAlreadyStartedException(Id);
+        
         _players.Add(player);
         _players.Sort((p1, p2) => string.Compare(p1.Name, p2.Name, StringComparison.Ordinal));
 
