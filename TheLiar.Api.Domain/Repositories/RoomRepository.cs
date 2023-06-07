@@ -4,7 +4,6 @@ using TheLiar.Api.Domain.Models;
 
 namespace TheLiar.Api.Domain.Repositories;
 
-
 public class RoomRepository : IRoomRepository
 {
     public IReadOnlyCollection<Room> Rooms => _rooms.AsReadOnly();
@@ -40,9 +39,9 @@ public class RoomRepository : IRoomRepository
     {
         if (string.IsNullOrWhiteSpace(id))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(id));
-        
+
         var exists = _rooms.Any(p => p.Id == id);
-        
+
         if (exists)
             throw new RoomAlreadyExistException(id);
     }
@@ -50,13 +49,22 @@ public class RoomRepository : IRoomRepository
     public void Save(Room room)
     {
         room.PublishEventsAndClear(_mediator);
-        
+
+        if (room.IsClosed)
+            return;
+
         if (_rooms.Contains(room))
             return;
-        
+
         _rooms.Add(room);
     }
-    
+
+    public void Remove(Room room)
+    {
+        if (_rooms.Contains(room))
+            _rooms.Remove(room);
+    }
+
 
     private readonly IMediator _mediator;
     private readonly List<Room> _rooms = new List<Room>();

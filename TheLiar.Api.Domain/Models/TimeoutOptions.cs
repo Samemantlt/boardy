@@ -4,5 +4,6 @@ public record TimeoutOptions(
     TimeSpan NewRoundTimeout,
     TimeSpan ShowSecretTimeout,
     TimeSpan VotingTimeout,
-    TimeSpan ShowRoundResultTimeout
+    TimeSpan ShowRoundResultTimeout,
+    TimeSpan EndGameTimeout
 );

@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Boardy.Domain.Core.Events;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using TheLiar.Api.Domain.Events;
@@ -9,26 +8,6 @@ using TheLiar.Api.Domain.Models.StateMachine;
 using TheLiar.Api.UseCases.Commands;
 
 namespace TheLiar.Api.SignalR;
-
-public class PublicEventSender : INotificationHandler<IPublicEvent>
-{
-    private readonly Func<GameHub> _gameHub;
-
-
-    public PublicEventSender(Func<GameHub> gameHub)
-    {
-        _gameHub = gameHub;
-    }
-
-
-    public async Task Handle(IPublicEvent notification, CancellationToken cancellationToken)
-    {
-        var hub = _gameHub();
-
-        await hub.Clients.Group(hub.GroupName(notification.RoomId))
-            .Raise(new RaisedEvent(notification.GetType().Name, notification));
-    }
-}
 
 public class GameHub : Hub<IHubUser>, IHubServer
 {

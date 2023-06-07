@@ -1,5 +1,6 @@
 using Boardy.Domain.Core.Events;
 using TheLiar.Api.Domain.Repositories;
+using TheLiar.Api.Domain.Services;
 using TheLiar.Api.Extensions;
 using TheLiar.Api.SignalR;
 using TheLiar.Api.UseCases.Commands;
@@ -20,6 +21,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<CreateRoom.Request>();
     cfg.RegisterServicesFromAssemblyContaining<PublicEventSender>();
     cfg.RegisterServicesFromAssemblyContaining<InvokeHandler>();
+    cfg.RegisterServicesFromAssemblyContaining<RoomClosedHandler>();
     cfg.AddBehavior<ConcurrentRoomPipelineBehaviour, ConcurrentRoomPipelineBehaviour>(ServiceLifetime.Singleton);
 });
 

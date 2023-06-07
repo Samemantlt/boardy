@@ -19,6 +19,7 @@ const CreateRoomPage = observer(() => {
         showSecretTimeout: dayjs("00:00:90", format),
         votingTimeout: dayjs("00:00:15", format),
         showRoundResultTimeout: dayjs("00:00:90", format),
+        endGameTimeout: dayjs("00:00:15", format)
     }));
 
     const otherOptions = useLocalStore(() => ({
@@ -32,6 +33,7 @@ const CreateRoomPage = observer(() => {
             showSecretTimeout: timeoutOptions.showSecretTimeout.format(format),
             votingTimeout: timeoutOptions.votingTimeout.format(format),
             showRoundResultTimeout: timeoutOptions.showRoundResultTimeout.format(format),
+            endGameTimeout: timeoutOptions.endGameTimeout.format(format)
         }
 
         try {
@@ -70,6 +72,11 @@ const CreateRoomPage = observer(() => {
                 <Form.Item label="Ожидание после результатов голосования">
                     <TimePicker onChange={(v, _) => timeoutOptions.showRoundResultTimeout = v}
                                 value={timeoutOptions.showRoundResultTimeout}/>
+                </Form.Item>
+
+                <Form.Item label="Ожидание после окончания игры">
+                    <TimePicker onChange={(v, _) => timeoutOptions.endGameTimeout = v}
+                                value={timeoutOptions.endGameTimeout}/>
                 </Form.Item>
 
                 <Form.Item label="Публичная комната">

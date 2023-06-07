@@ -10,4 +10,5 @@ public interface IRoomRepository
     ValueTask AssertUniqueId(string id);
 
     void Save(Room room);
+    void Remove(Room room);
 }

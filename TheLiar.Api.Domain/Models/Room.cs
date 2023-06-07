@@ -16,6 +16,8 @@ public class Room : EntityBase
     public Player Admin { get; }
     
     public bool IsPublic { get; }
+    
+    public bool IsClosed { get; private set; } = false;
 
     public Player Mafia => Players.Single(p => p.IsMafia);
 
@@ -68,7 +70,7 @@ public class Room : EntityBase
         _players.Remove(player);
         
         if (player == Admin)
-            RaiseEvent(new RoomClosed(Id));
+            Close();
         
         if (player.IsMafia)
             Invoke(() => new WinPlayersGameState(Globals));
@@ -91,6 +93,15 @@ public class Room : EntityBase
     public void Invoke(Func<GameState> func)
     {
         InvokeInStateMachine(GameState!, func);
+    }
+
+    public void Close()
+    {
+        if (IsClosed)
+            return;
+        
+        IsClosed = true;
+        RaiseEvent(new RoomClosed(Id));
     }
 
     private GameStateGlobals CreateGlobals()

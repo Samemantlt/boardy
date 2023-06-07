@@ -29,7 +29,8 @@ export type TimeoutOptions = {
     newRoundTimeout: string,
     showSecretTimeout: string,
     votingTimeout: string,
-    showRoundResultTimeout: string
+    showRoundResultTimeout: string,
+    endGameTimeout: string
 };
 
 export type RoomUpdated = {

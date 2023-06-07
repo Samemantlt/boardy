@@ -50,6 +50,7 @@ export class GameTimer {
         showSecretTimeout: Date,
         votingTimeout: Date,
         showRoundResultTimeout: Date,
+        endGameTimeout: Date
     };
     current?: TimerInfo;
 
@@ -65,6 +66,7 @@ export class GameTimer {
             showSecretTimeout: moment(options.showSecretTimeout, "hh:mm:ss").toDate(),
             votingTimeout: moment(options.votingTimeout, "hh:mm:ss").toDate(),
             showRoundResultTimeout: moment(options.showRoundResultTimeout, "hh:mm:ss").toDate(),
+            endGameTimeout: moment(options.endGameTimeout, "hh:mm:ss").toDate(),
         };
 
         this.refreshTimer(stateType);
@@ -88,6 +90,9 @@ export class GameTimer {
 
         if (stateType == GameStateType.ShowRoundResult)
             return this.options.showRoundResultTimeout.getSeconds();
+
+        if (stateType == GameStateType.WinMafia || stateType == GameStateType.WinPlayers)
+            return this.options.endGameTimeout.getSeconds();
 
 
         return undefined;
